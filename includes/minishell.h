@@ -15,6 +15,8 @@
 
 #define T_DIRENT struct dirent
 
+volatile sig_atomic_t g_signal = 0;
+
 typedef struct s_files {
 	struct dirent	*readdir;
 	struct s_files	*next;
