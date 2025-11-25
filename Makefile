@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: dedavid <dedavid@student.42.fr>            +#+  +:+       +#+         #
+#    By: marcheva <marcheva@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/11/24 15:35:28 by dedavid           #+#    #+#              #
-#    Updated: 2025/11/24 15:53:49 by dedavid          ###   ########.fr        #
+#    Updated: 2025/11/25 13:02:25 by marcheva         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,11 +20,17 @@ LIBS	:= Libft/libft.a
 all: $(NAME)
 
 $(NAME):
+	make -C Libft
 	$(CC) $(CFLAGS) $(SRCS) $(LIBS) -o $(NAME)
 
 clean:
+	make clean -C Libft
+	rm -rf $(NAME)
+
+fclean:
+	make fclean -C Libft
 	rm -rf $(NAME)
 
 re: fclean all
 
-.PHONY: all clean fclean re
+.PHONY: all clean fclean re $(NAME)

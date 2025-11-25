@@ -1,46 +1,67 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_ctrl.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: marcheva <marcheva@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/11/25 09:52:46 by marcheva          #+#    #+#             */
+/*   Updated: 2025/11/25 16:14:18 by marcheva         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../includes/minishell.h"
+
+volatile sig_atomic_t g_signo = 0;
 
 void ctrl_c(int signe)
 {
-	g_signal = signe;
-	printf("\n");
+	g_signo = signe;
+	printf("^C\n");
 	rl_on_new_line();
-	rl_replace_line("", 0);
 	rl_redisplay();
 }
 
-void ctrl_\\(int signe)
+void ctrl_back_slash(int signe)
 {
-	g_signal = signe;
+	g_signo = signe;
 }
 
-int main(void)
+int ctrl_d(t_mini *mini,char *line)
 {
-    struct sigaction sa;
+	if (!line)
+	{
+		ft_suicide(mini,0);
+	}
+	return (0);
+}
 
-    // Gestion de ctrl-C
-    sa.sa_handler = sigint_handler;
-    sigemptyset(&sa.sa_mask);
-    sa.sa_flags = SA_RESTART;
-    sigaction(SIGINT, &sa, NULL);
+void setup_signals(void)
+{
+	struct sigaction sa;
 
-    // Gestion de ctrl-\
-    sa.sa_handler = sigquit_handler;
-    sigemptyset(&sa.sa_mask);
-    sa.sa_flags = SA_RESTART;
-    sigaction(SIGQUIT, &sa, NULL);
+	sa.sa_handler = ctrl_c;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = SA_RESTART;
+	sigaction(SIGINT, &sa, NULL);
 
-    while (1)
-    {
-        char *line = readline("minishell> ");
-        if (!line) // ctrl-D
-        {
-            printf("exit\n");
-            break;
-        }
-        add_history(line);
-        // ... parsing + exécution
-        free(line);
-    }
-    return 0;
+	sa.sa_handler = ctrl_back_slash;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = SA_RESTART;
+	sigaction(SIGQUIT, &sa, NULL);
+}
+
+void run_shell(t_mini *mini)
+{
+	char *line;
+
+	while (1)
+	{
+		line = readline("ft_suicide $");
+		if (ctrl_d(mini,line))
+			break ;
+		if (*line)
+			add_history(line);
+		free(line);
+	}
 }
