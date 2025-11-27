@@ -6,7 +6,7 @@
 /*   By: marcheva <marcheva@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 16:43:17 by dedavid           #+#    #+#             */
-/*   Updated: 2025/11/25 15:07:43 by marcheva         ###   ########.fr       */
+/*   Updated: 2025/11/27 13:29:48 by dedavid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,8 @@ void	free_env(void *content)
 		return ;
 	env = content;
 	free(env->name);
-	free(env->value);
+	if (env->value)
+		free(env->value);
 	free(env);
 }
 

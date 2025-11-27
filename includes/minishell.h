@@ -34,25 +34,43 @@ typedef struct s_env
 {
 	char	*name;
 	char	*value;
+	struct s_env	*next;
 }	t_env;
 
 typedef struct s_mini
 {
 	char	*path;
+	char	**envp;
 	t_list	*env;
 }	t_mini;
+
+typedef struct s_cmd
+{
+	int		buildtin; 
+	char	**argv;
+	char	*outfile;
+	char	*intfile;
+	char	*here_doc;
+	int		append;
+	struct	s_cmd *next;
+}	t_cmd;
 
 void	free_mini(t_mini *mini);
 
 //commands functions
-void	mini_export(t_mini *mini, char *name, char *value);
+void	mini_export(t_mini *mini, t_cmd *cmd);
 void	mini_echo(char *str, int n);
 void	mini_pwd(t_mini *mini);
-void	ft_suicide(t_mini *mini, int code);
-void	mini_ls(t_mini *mini, const char *path);
-void	mini_cd(t_mini *mini, char *path);
+void	ft_suicide(t_mini *mini, int code, t_cmd *cmd);
+void	mini_cd(t_mini *mini, t_cmd *path);
 void	mini_env(t_mini *mini);
-void	mini_unset(t_mini *mini, char *name);
+void	mini_unset(t_mini *mini, t_cmd *cmd);
+
+//commands utils
+void	swap_last(t_mini *mini);
+t_env	*get_lowest(t_list *list);
+t_env	*get_highest(t_list *list);
+void	print_env_alpha(t_mini *mini);
 
 //debug functions
 void	print_env(t_mini *mini);
@@ -73,4 +91,13 @@ void	disable_echoctl(void);
 //free functions
 void	free_env(void *content);
 
+
+//parsing
+char **tabpara(char *line);
+char *get_command(char *line , int *i);
+int	ft_signe(char c);
+int is_builtin(char *cmd);
+void exec_cmd(t_cmd *cmd,t_mini *mini);
+t_cmd *parse_command(char **para);
+void exec_no_build(t_cmd *cmd, t_mini *mini);
 #endif

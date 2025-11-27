@@ -6,7 +6,7 @@
 /*   By: dedavid <dedavid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 15:30:37 by dedavid           #+#    #+#             */
-/*   Updated: 2025/11/25 14:08:27 by dedavid          ###   ########.fr       */
+/*   Updated: 2025/11/27 14:01:08 by dedavid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,8 +52,21 @@ void	cd(t_mini *mini, char *path)
 	}
 }
 
-void	mini_cd(t_mini *mini, char *path)
+void	mini_cd(t_mini *mini, t_cmd *cmd)
 {
+	char	*path;
+	int		i;
+
+	i = 0;
+	while (cmd->argv[++i])
+	{
+		if (i > 1)
+		{
+			perror(strerror(2));
+			return ;
+		}
+	}
+	path = cmd->argv[i];
 	if (ft_strcmp("~", path) == 0)
 		change_path(mini, ft_strdup(find_env(mini->env, "HOME")->value));
 	else if (ft_strcmp("/", path) == 0)

@@ -6,7 +6,7 @@
 /*   By: dedavid <dedavid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/22 12:13:49 by dedavid           #+#    #+#             */
-/*   Updated: 2025/11/24 17:23:23 by dedavid          ###   ########.fr       */
+/*   Updated: 2025/11/26 14:17:53 by dedavid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,5 +34,6 @@ void    ft_striteri(char *s, void (*f)(unsigned int, char*));
 char    *ft_strmapi(char const *s, char (*f)(unsigned int, char));
 char    **ft_split(char const *s, char c);
 char    *ft_substr(const char *s, unsigned int start, size_t len);
+int		str_isdigit(char *str);
 
 #endif

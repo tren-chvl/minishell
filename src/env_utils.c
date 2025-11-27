@@ -6,7 +6,7 @@
 /*   By: dedavid <dedavid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/25 10:23:57 by dedavid           #+#    #+#             */
-/*   Updated: 2025/11/25 13:40:53 by dedavid          ###   ########.fr       */
+/*   Updated: 2025/11/25 17:10:37 by dedavid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,10 +51,15 @@ void	fill_env(t_mini *mini, char **envp)
 	while (envp[++i])
 	{
 		j = 0;
-		while (envp[i][j] != '=')
+		while (envp[i][j] != '=' && envp[i][j])
 			j++;
-		envp[i][j] = 0;
-		ft_lstadd_back(&env, ft_lstnew(envnew(envp[i], &envp[i][++j])));
+		if (envp[i][j] == '=')
+		{
+			envp[i][j] = 0;
+			ft_lstadd_back(&env, ft_lstnew(envnew(envp[i], &envp[i][++j])));
+		}
+		else
+			ft_lstadd_back(&env, ft_lstnew(envnew(envp[i], NULL)));
 	}
 	mini->env = env;
 }

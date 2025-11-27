@@ -1,23 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_ctrl2.c                                         :+:      :+:    :+:   */
+/*   str_isdigit.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcheva <marcheva@student.42.fr>          +#+  +:+       +#+        */
+/*   By: dedavid <dedavid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/11/25 16:08:10 by marcheva          #+#    #+#             */
-/*   Updated: 2025/11/27 13:28:27 by marcheva         ###   ########.fr       */
+/*   Created: 2025/11/26 14:06:08 by dedavid           #+#    #+#             */
+/*   Updated: 2025/11/26 14:09:21 by dedavid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../includes/minishell.h"
+#include <libft_string.h>
+#include <libft_char.h>
 
-void	disable_echoctl(void)
+int	str_isdigit(char *str)
 {
-	struct termios	term;
+	int	i;
 
-	if (tcgetattr(STDIN_FILENO, &term) == -1)
-		return ;
-	term.c_lflag &= ~ECHOCTL;
-	tcsetattr(STDIN_FILENO, TCSANOW, &term);
+	i = -1;
+	while (str[++i])
+		if (!ft_isdigit(str[i]))
+			return (0);
+	return (1);
 }
