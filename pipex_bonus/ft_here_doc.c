@@ -23,14 +23,14 @@ void	read_here_doc(char *limiter, int fd[2])
 		line = get_next_line(STDIN_FILENO);
 		if (!line)
 			break ;
-		if (ft_strncmp(line, limiter, ft_strlen(limiter)) == 0
-			&& line[ft_strlen(limiter)] != '\0'
-			&& line[ft_strlen(limiter)] == '\n')
+		if (ft_strncmp_pp(line, limiter, ft_strlen_pp(limiter)) == 0
+			&& line[ft_strlen_pp(limiter)] != '\0'
+			&& line[ft_strlen_pp(limiter)] == '\n')
 		{
 			free(line);
 			break ;
 		}
-		write(fd[1], line, ft_strlen(line));
+		write(fd[1], line, ft_strlen_pp(line));
 		free(line);
 	}
 	close(fd[1]);
@@ -55,14 +55,14 @@ int	init_here_doc(char *limiter)
 void	run_middle_command(t_data *data, int *prev_fd, int i)
 {
 	int		fd[2];
-	t_cmd	cmd;
+	t_cmd_p	cmd;
 
 	if (pipe(fd) == -1)
 	{
 		perror("pipe");
 		exit(1);
 	}
-	cmd.args = ft_split(data->argv[i], ' ');
+	cmd.args = ft_split_pp(data->argv[i], ' ');
 	cmd.path = find_path(cmd.args[0], data->envp);
 	cmd.envp = data->envp;
 	exec_middle(*prev_fd, &cmd, fd);
@@ -77,7 +77,7 @@ pid_t	run_commands(t_data *data, int prev_fd, int start_index)
 {
 	int		i;
 	pid_t	last_pid;
-	t_cmd	cmd;
+	t_cmd_p	cmd;
 
 	i = start_index;
 	while (i < data->argc - 2)
@@ -85,7 +85,7 @@ pid_t	run_commands(t_data *data, int prev_fd, int start_index)
 		run_middle_command(data, &prev_fd, i);
 		i++;
 	}
-	cmd.args = ft_split(data->argv[data->argc - 2], ' ');
+	cmd.args = ft_split_pp(data->argv[data->argc - 2], ' ');
 	cmd.path = find_path(cmd.args[0], data->envp);
 	cmd.envp = data->envp;
 	last_pid = exec_last(prev_fd, &cmd, data);
@@ -103,7 +103,7 @@ int	here_doc(int argc, char **argv, char **envp)
 
 	if (argc < 6)
 		return (error_msg("error argument :( "));
-	ft_bzero(&data, sizeof(t_data));
+	ft_bzero_pp(&data, sizeof(t_data));
 	data.argc = argc;
 	data.argv = argv;
 	data.envp = envp;

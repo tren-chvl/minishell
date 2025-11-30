@@ -18,7 +18,7 @@ int	error_msg(char *msg)
 	return (1);
 }
 
-int	ft_strlen(char *str)
+int	ft_strlen_pp(char *str)
 {
 	int	i;
 
@@ -30,7 +30,7 @@ int	ft_strlen(char *str)
 	return (i);
 }
 
-int	ft_strncmp(char *s1, char *s2, unsigned int n)
+int	ft_strncmp_pp(char *s1, char *s2, unsigned int n)
 {
 	unsigned int	i;
 

@@ -39,7 +39,7 @@ int	open_outfile(t_data *data)
 	return (fd);
 }
 
-void	child_exec(int prev_fd, int outfile_fd, t_cmd *cmd)
+void	child_exec(int prev_fd, int outfile_fd, t_cmd_p *cmd)
 {
 	dup2(prev_fd, STDIN_FILENO);
 	dup2(outfile_fd, STDOUT_FILENO);
@@ -48,7 +48,7 @@ void	child_exec(int prev_fd, int outfile_fd, t_cmd *cmd)
 	safe_execve(cmd->path, cmd->args, cmd->envp);
 }
 
-pid_t	exec_last(int prev_fd, t_cmd *cmd, t_data *data)
+pid_t	exec_last(int prev_fd, t_cmd_p *cmd, t_data *data)
 {
 	int		outfile_fd;
 	pid_t	pid;

@@ -12,24 +12,9 @@
 
 #include "minishell.h"
 
-
-void free_tab(char **tab)
-{
-	int i;
-
-	i = 0;
-	if (!tab)
-		return ;
-	while (tab[i])
-	{
-		free(tab[i]);
-		i++;
-	}
-	 free(tab);
-}
 char	*get_env_value(t_env *env,char *name)
 {
-	t_env *tmp;
+	t_env	*tmp;
 
 	if (!env || !name)
 		return (NULL);
@@ -43,73 +28,50 @@ char	*get_env_value(t_env *env,char *name)
 	return (NULL);
 }
 
-char    **get_env_path(t_list *env)
+char *find_exec(t_mini *mini, char *cmd)
 {
-	char    *path;
 	char    **paths;
+	char    *test;
 	int     i;
-	t_list  *tmp;
-	t_env   *var;
-	char *tmp_str;
 
-	path = NULL;
-	tmp = env;
-	while (tmp)
-	{
-		var = (t_env *)tmp->content;
-		if (!ft_strcmp(var->name, "PATH"))
-		{
-			path = var->value;
-			break;
-		}
-		tmp = tmp->next;
-	}
-	if (!path)
+	if (!cmd || !*cmd)
 		return (NULL);
-	paths = ft_split(path, ':');
+	if (ft_strchr(cmd, '/'))
+	{
+		if (access(cmd, X_OK) == 0)
+			return (ft_strdup(cmd));
+		return (NULL);
+	}
+	paths = get_env_path(mini->env);
 	if (!paths)
 		return (NULL);
 	i = 0;
 	while (paths[i])
 	{
-		if (paths[i][ft_strlen(paths[i]) - 1] != '/')
-		{
-			tmp_str = ft_strjoin(paths[i], "/");
-			free(paths[i]);
-			paths[i] = tmp_str;
-		}
-		i++;
-	}
-	return (paths);
-}
-
-
-
-char *find_exec(t_mini *mini, char *cmd)
-{
-	char **path;
-	char *test;
-	int i;
-
-	if (!cmd)
-		return (NULL);
-	i = 0;
-	path = get_env_path(mini->env);
-	while (path && path[i])
-	{
-		test = ft_strjoin(path[i], cmd);
+		test = ft_strjoin(paths[i], cmd);
 		if (access(test, X_OK) == 0)
 		{
-			free_tab(path);
+			free_tab(paths);
 			return (test);
 		}
 		free(test);
 		i++;
 	}
-	free_tab(path);
-	return (NULL);	
+	free_tab(paths);
+	return (NULL);
 }
 
+
+int commande_not_found(t_cmd *cmd, char *exec, t_mini *mini)
+{
+	if (!exec)
+	{
+		ft_printf("minishell : %s: command not found\n",cmd->argv[0]);
+		mini->last = 127;
+		return (1);
+	}
+	return (0);
+}
 void exec_no_build(t_cmd *cmd, t_mini *mini)
 {
 	pid_t	pid;
@@ -117,11 +79,8 @@ void exec_no_build(t_cmd *cmd, t_mini *mini)
 	char	*exec;
 
 	exec = find_exec(mini,cmd->argv[0]);
-	if (!exec)
-	{
-		ft_printf("minishell : %s command not found\n",cmd->argv[0]);
+	if (commande_not_found(cmd, exec, mini))
 		return ;
-	}
 	pid = fork();
 	if (pid == -1)
 	{
@@ -130,6 +89,7 @@ void exec_no_build(t_cmd *cmd, t_mini *mini)
 	}
 	if (pid == 0)
 	{
+		ft_redirection(cmd, mini);
 		 if (execve(exec, cmd->argv,mini->envp) == -1)
 		 {
 			perror("execve");
@@ -137,6 +97,9 @@ void exec_no_build(t_cmd *cmd, t_mini *mini)
 		 }
 	}
 	else
-		waitpid(pid, &statut, 0);
+    {
+        waitpid(pid, &statut, 0);
+        mini->last = WEXITSTATUS(statut);
+	}
 	free(exec);
 }

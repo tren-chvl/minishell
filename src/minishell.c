@@ -10,30 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <minishell.h>
+#include "../../includes/minishell.h"
 
-void	free_cmd(t_cmd *cmd)
-{
-	t_cmd	*tmp;
-	int		j;
-
-	while (cmd)
-	{
-		tmp = cmd->next;
-		if (cmd->argv)
-		{
-			j = 0;
-			while (cmd->argv[j])
-			{
-				free(cmd->argv[j]);
-				j++;
-			}
-			free(cmd->argv);
-		}
-		free(cmd);
-		cmd = tmp;
-	}
-}
 
 void	run_shell(t_mini *mini)
 {
@@ -53,7 +31,7 @@ void	run_shell(t_mini *mini)
 		if (*line)
 		{
 			tab = tabpara(line);
-			cmd = parse_command(tab);
+			cmd = parse_command(tab,mini);
 			exec_cmd(cmd, mini);
 			free_cmd(cmd);
 			i = 0;

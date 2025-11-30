@@ -12,31 +12,7 @@
 
 #include "pipex.h"
 
-void	safe_execve(char *path, char **argv, char **envp)
-{
-	if (!path)
-	{
-		ft_free_tab(argv);
-		exit(127);
-	}
-	execve(path, argv, envp);
-	ft_free_tab(argv);
-	free(path);
-	if (errno == EACCES)
-		exit(126);
-	else if (errno == ENOENT)
-	{
-		if (ft_strchr(argv[0], '/'))
-			exit(1);
-		else
-			exit(127);
-	}
-	else
-	{
-		perror("execve");
-		exit(1);
-	}
-}
+
 
 void	exec_commande(char *cmd, char **envp)
 {
@@ -45,14 +21,14 @@ void	exec_commande(char *cmd, char **envp)
 
 	if (!cmd || !*cmd)
 		exit(127);
-	split = ft_split(cmd, ' ');
+	split = ft_split_pp(cmd, ' ');
 	if (!split || !split[0] || !*split[0])
 	{
 		ft_free_tab(split);
 		exit(127);
 	}
 	if (ft_strchr(split[0], '/'))
-		path = ft_strdup(split[0]);
+		path = ft_strdup_pp(split[0]);
 	else
 		path = find_path(split[0], envp);
 	safe_execve(path, split, envp);
@@ -64,7 +40,7 @@ int	main(int argc, char **argv, char **envp)
 
 	if (argc < 5)
 		return (error_msg("error argument :( "));
-	if (ft_strcmp(argv[1], "here_doc") == 0)
+	if (ft_strcmp_pp(argv[1], "here_doc") == 0)
 		ret = here_doc(argc, argv, envp);
 	else
 		ret = pipex(argc, argv, envp);

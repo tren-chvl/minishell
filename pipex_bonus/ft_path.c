@@ -12,13 +12,13 @@
 
 #include "pipex.h"
 
-char	*ft_strdup(char *s1)
+char	*ft_strdup_pp(char *s1)
 {
 	size_t	len;
 	char	*dest;
 	size_t	i;
 
-	len = ft_strlen(s1);
+	len = ft_strlen_pp(s1);
 	dest = (char *)malloc(sizeof(char) * (len + 1));
 	if (!dest)
 		return (NULL);
@@ -40,7 +40,7 @@ char	*result_path(char **path, char *cmd)
 	j = 0;
 	while (path[j])
 	{
-		full_path = ft_strjoin(path[j], cmd);
+		full_path = ft_strjoin_pp(path[j], cmd);
 		if (access(full_path, F_OK) == 0)
 		{
 			ft_free_tab(path);
@@ -53,6 +53,32 @@ char	*result_path(char **path, char *cmd)
 	return (NULL);
 }
 
+void	safe_execve(char *path, char **argv, char **envp)
+{
+	if (!path)
+	{
+		ft_free_tab(argv);
+		exit(127);
+	}
+	execve(path, argv, envp);
+	ft_free_tab(argv);
+	free(path);
+	if (errno == EACCES)
+		exit(126);
+	else if (errno == ENOENT)
+	{
+		if (ft_strchr(argv[0], '/'))
+			exit(1);
+		else
+			exit(127);
+	}
+	else
+	{
+		perror("execve");
+		exit(1);
+	}
+}
+
 char	*find_path(char *cmd, char **tabenv)
 {
 	int		i;
@@ -62,13 +88,13 @@ char	*find_path(char *cmd, char **tabenv)
 	i = 0;
 	if (!cmd || !*cmd)
 		exit(127);
-	if (ft_strchr(cmd, '/'))
-		return (ft_strdup(cmd));
-	while (tabenv[i] && ft_strncmp(tabenv[i], "PATH=", 5))
+	if (ft_strchr_gnl(cmd, '/'))
+		return (ft_strdup_pp(cmd));
+	while (tabenv[i] && ft_strncmp_pp(tabenv[i], "PATH=", 5))
 		i++;
 	if (!tabenv[i])
 		return (NULL);
-	path = ft_split(tabenv[i] + 5, ':');
+	path = ft_split_pp(tabenv[i] + 5, ':');
 	result = result_path(path, cmd);
 	return (result);
 }

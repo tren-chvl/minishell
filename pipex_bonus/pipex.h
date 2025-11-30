@@ -25,6 +25,7 @@
 # include <errno.h>
 # include <stdarg.h>
 # include <stdio.h>
+# include "minishell.h"
 
 typedef struct s_data
 {
@@ -35,21 +36,22 @@ typedef struct s_data
 	int		append;
 }	t_data;
 
-typedef struct s_cmd
+typedef struct s_cmd_p
 {
 	char	*path;
 	char	**args;
 	char	**envp;
-}	t_cmd;
+}	t_cmd_p;
+
 
 void	safe_execve(char *path, char **argv, char **envp);
 int		error_msg(char *msg);
-char	*ft_strjoin(char *dir, char *cmd);
-int		ft_strlen(char *str);
-char	**ft_split(char *s, char c);
-int		ft_strncmp(char *s1, char *s2, unsigned int n);
-int		ft_strcmp(char *s1, char *s2);
-void	ft_bzero(void *s, size_t n);
+char	*ft_strjoin_pp(char *dir, char *cmd);
+int		ft_strlen_pp(char *str);
+char	**ft_split_pp(char *s, char c);
+int		ft_strncmp_pp(char *s1, char *s2, unsigned int n);
+int		ft_strcmp_pp(char *s1, char *s2);
+void	ft_bzero_pp(void *s, size_t n);
 
 char	*find_path(char *cmd, char **envp);
 void	ft_free_tab(char **tab);
@@ -57,8 +59,8 @@ void	exec_commande(char *cmd, char **envp);
 int		here_doc(int argc, char **argv, char **envp);
 int		pipex(int argc, char **argv, char **envp);
 int		wait_all(pid_t last_pid);
-pid_t	exec_middle(int prev_fd, t_cmd *cmd, int fd[2]);
-pid_t	exec_last(int prev_fd, t_cmd *cmd, t_data *data);
+pid_t	exec_middle(int prev_fd, t_cmd_p *cmd, int fd[2]);
+pid_t	exec_last(int prev_fd, t_cmd_p *cmd, t_data *data);
 pid_t	run_commands(t_data *data, int prev_fd, int start_index);
 
 char	*get_next_line(int fd);
@@ -68,9 +70,9 @@ char	*clean_line(char *line);
 
 size_t	ft_strlen_g(char *line);
 char	*ft_strjoin_gnl(char *s1, char *s2);
-char	*ft_strchr(char *s, int c);
+char	*ft_strchr_gnl(char *s, int c);
 char	*free_return(char *s1, char *join);
-char	*ft_strdup(char *s1);
+char	*ft_strdup_pp(char *s1);
 char	*null_free(char **tab);
 char	*full_free(char **tab, char *full);
 

@@ -31,18 +31,22 @@ void	exec_build(t_cmd *cmd, t_mini *mini)
 	else if (!ft_strcmp(cmd->argv[0], "env"))
 		mini_env(mini);
 }
-
-void	exec_cmd(t_cmd *cmd, t_mini *mini)
+void exec_cmd(t_cmd *cmd, t_mini *mini)
 {
-	t_cmd	*tmp;
-
-	tmp = cmd;
-	while (tmp)
-	{
-		if (tmp->buildtin)
-			exec_build(tmp, mini);
-		else
-			exec_no_build(tmp,mini);
-		tmp = tmp->next;
-	}
+    if (cmd->next)
+        run_commands_list(cmd, mini);
+    else
+    {
+		if (!cmd->argv || !cmd->argv[0])
+        {
+            ft_redirection(cmd, mini);
+            mini->last = 0;
+            return;
+        }
+        if (cmd->buildtin)
+            exec_build(cmd, mini);
+        else
+            exec_no_build(cmd, mini);
+    }
 }
+

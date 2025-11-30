@@ -12,7 +12,7 @@
 
 #include "pipex.h"
 
-pid_t	exec_middle(int prev_fd, t_cmd *cmd, int fd[2])
+pid_t	exec_middle(int prev_fd, t_cmd_p *cmd, int fd[2])
 {
 	pid_t	pid;
 

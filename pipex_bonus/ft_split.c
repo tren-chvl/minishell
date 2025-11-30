@@ -86,7 +86,7 @@ static int	full_tab(char **tab, char const *s, char c)
 	return (1);
 }
 
-char	**ft_split(char *s, char c)
+char	**ft_split_pp(char *s, char c)
 {
 	int		count;
 	char	**tab;

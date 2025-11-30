@@ -12,7 +12,7 @@
 
 #include "pipex.h"
 
-char	*ft_strjoin(char *dir, char *cmd)
+char	*ft_strjoin_pp(char *dir, char *cmd)
 {
 	char	*join;
 	int		i;
@@ -20,7 +20,7 @@ char	*ft_strjoin(char *dir, char *cmd)
 
 	j = 0;
 	i = 0;
-	join = malloc(sizeof(char) * (ft_strlen(dir) + ft_strlen(cmd)+ 2));
+	join = malloc(sizeof(char) * (ft_strlen_pp(dir) + ft_strlen_pp(cmd)+ 2));
 	if (!join)
 		return (NULL);
 	while (dir[i])
@@ -39,7 +39,7 @@ char	*ft_strjoin(char *dir, char *cmd)
 	return (join);
 }
 
-int	ft_strcmp(char *s1, char *s2)
+int	ft_strcmp_pp(char *s1, char *s2)
 {
 	int	i;
 
@@ -51,7 +51,7 @@ int	ft_strcmp(char *s1, char *s2)
 	return ((unsigned char)s1[i] - (unsigned char)s2[i]);
 }
 
-void	ft_bzero(void *s, size_t n)
+void	ft_bzero_pp(void *s, size_t n)
 {
 	size_t			i;
 	unsigned char	*str;

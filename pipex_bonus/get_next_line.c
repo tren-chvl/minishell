@@ -74,7 +74,7 @@ char	*read_newline(int fd, char *line)
 	read_byte = 1;
 	if (!buffer)
 		free_return(line, NULL);
-	while (read_byte > 0 && !ft_strchr(line, '\n'))
+	while (read_byte > 0 && !ft_strchr_gnl(line, '\n'))
 	{
 		read_byte = read(fd, buffer, BUFFER_SIZE);
 		if (read_byte < 0)

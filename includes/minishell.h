@@ -25,6 +25,7 @@
 #include <signal.h>
 #include <dirent.h>
 #include "libft.h"
+#include "../pipex_bonus/pipex.h"
 
 #define T_DIRENT struct dirent
 
@@ -41,12 +42,14 @@ typedef struct s_mini
 {
 	char	*path;
 	char	**envp;
+	int		last;
 	t_list	*env;
 }	t_mini;
 
 typedef struct s_cmd
 {
-	int		buildtin; 
+	int		buildtin;
+	char	*path;
 	char	**argv;
 	char	*outfile;
 	char	*intfile;
@@ -54,6 +57,15 @@ typedef struct s_cmd
 	int		append;
 	struct	s_cmd *next;
 }	t_cmd;
+
+typedef struct s_envpath
+{
+    char	*path;
+    char	**paths;
+    int		i;
+    char	*tmp_str;
+}	t_envpath;
+
 
 void	free_mini(t_mini *mini);
 
@@ -71,6 +83,8 @@ void	swap_last(t_mini *mini);
 t_env	*get_lowest(t_list *list);
 t_env	*get_highest(t_list *list);
 void	print_env_alpha(t_mini *mini);
+void	free_tab(char **tab);
+void	free_cmd(t_cmd *cmd);
 
 //debug functions
 void	print_env(t_mini *mini);
@@ -93,11 +107,19 @@ void	free_env(void *content);
 
 
 //parsing
-char **tabpara(char *line);
-char *get_command(char *line , int *i);
-int	ft_signe(char c);
-int is_builtin(char *cmd);
-void exec_cmd(t_cmd *cmd,t_mini *mini);
-t_cmd *parse_command(char **para);
-void exec_no_build(t_cmd *cmd, t_mini *mini);
+char	**tabpara(char *line);
+char	*get_command(char *line , int *i);
+int		ft_signe(char c);
+int		is_builtin(char *cmd);
+void	exec_cmd(t_cmd *cmd,t_mini *mini);
+t_cmd	*parse_command(char **para,t_mini *mini);
+void	exec_no_build(t_cmd *cmd, t_mini *mini);
+char	**get_env_path(t_list *env);
+char	*find_exec(t_mini *mini, char *cmd);
+void	ft_redirection(t_cmd *cmd, t_mini *mini);
+void	run_middle_list( t_cmd *cmd, int *prev_fd, t_mini *mini);
+pid_t	exec_last_child(int prev, t_cmd *cmd, t_mini *mini);
+pid_t	run_commands_list(t_cmd *cmd_list, t_mini *mini);
+
+
 #endif

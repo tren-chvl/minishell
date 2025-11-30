@@ -59,7 +59,7 @@ char	*ft_strjoin_gnl(char *s1, char *s2)
 	return (free_return(s1, join));
 }
 
-char	*ft_strchr(char *s, int c)
+char	*ft_strchr_gnl(char *s, int c)
 {
 	if (!s)
 		return (NULL);

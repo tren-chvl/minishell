@@ -101,7 +101,7 @@ char	**ft_word(char *line)
 	return (argv);
 }
 
-t_cmd	*parse_command(char **para)
+t_cmd	*parse_command(char **para, t_mini *mini)
 {
 	t_cmd	*head;
 	t_cmd	*tmp;
@@ -119,6 +119,9 @@ t_cmd	*parse_command(char **para)
 		ft_bzero(new, sizeof(t_cmd));
 		new->argv = ft_word(para[i]);
 		new->buildtin = is_builtin(new->argv[0]);
+		new->path = NULL;
+		if (!new->buildtin && new->argv[0])
+			new->path = find_exec(mini, new->argv[0]);
 		if (!head)
 			head = new;
 		else
