@@ -54,11 +54,11 @@ void	putunsignednbr_base(size_t nbr, char *base)
 		return ;
 	len = ft_strlen(base);
 	l = nbr;
-	if (l < 0)
-	{
-		putchar_fd('-', 1);
-		l *= -1;
-	}
+	// if (l < 0)
+	// {
+	// 	putchar_fd('-', 1);
+	// 	l *= -1;
+	// }
 	if (l >= len)
 	{
 		putnbr_base(l / len, base);

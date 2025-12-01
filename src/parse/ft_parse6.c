@@ -136,16 +136,15 @@ void	handle_redir(t_cmd *res, t_token *toks, int nbtok, int *i)
 	{
 		if (*i + 1 < nbtok && toks[*i + 1].type == TOK_WORD)
 		{
-			res->here_doc = toks[*i + 1].val;
+			res->delimiter = toks[*i + 1].val;
 			toks[*i + 1].val = NULL;
 			(*i)++;
 		}
-		else
-			res->here_doc = NULL;
-	}
+	else
+		res->delimiter = NULL;
 }
 
-
+}
 
 t_cmd	*parse_command_line(char *line)
 {

@@ -70,7 +70,9 @@ typedef struct s_cmd
 	char			*outfile;
 	char			*intfile;
 	char			*here_doc;
+	char			*delimiter;
 	int				append;
+	int				here_fd;
 	struct s_cmd	*next;
 }	t_cmd;
 
@@ -138,4 +140,5 @@ void	free_tab(char **tab);
 void	free_cmd(t_cmd *cmd);
 int		ft_isspace(char c);
 t_cmd	*parse_command_line(char *line);
+int		open_outfile(t_cmd *cmd);
 #endif

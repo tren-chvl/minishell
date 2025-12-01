@@ -41,12 +41,15 @@ void exec_cmd(t_cmd *cmd, t_mini *mini)
 	{
 		if (!cmd->argv || !cmd->argv[0])
 		{
+			if (cmd->delimiter)
+			{
+				mini->last = 2;
+				return;
+			}
 			ft_redirection(cmd, mini);
 			mini->last = 0;
-			return;
+			return ;
 		}
-		if (cmd->here_doc)
-			process_heredoc(cmd);
 		if (cmd->buildtin)
 			exec_build(cmd, mini);
 		else

@@ -97,9 +97,9 @@ void exec_no_build(t_cmd *cmd, t_mini *mini)
 		 }
 	}
 	else
-    {
-        waitpid(pid, &statut, 0);
-        mini->last = WEXITSTATUS(statut);
+	{
+		waitpid(pid, &statut, 0);
+		mini->last = WEXITSTATUS(statut);
 	}
 	free(exec);
 }

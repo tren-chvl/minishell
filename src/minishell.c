@@ -13,13 +13,11 @@
 #include "minishell.h"
 
 
- void run_shell(t_mini *mini)
+void run_shell(t_mini *mini)
 {
 	char	*line;
-	int		i;
 	t_cmd	*cmd;
 
-	i = 0;
 	disable_echoctl();
 	setup_signals();
 	while (1)

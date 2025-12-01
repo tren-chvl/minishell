@@ -1,23 +1,11 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ft_pipeline.c                                      :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: marcheva <marcheva@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/12/01 10:18:28 by marcheva          #+#    #+#             */
-/*   Updated: 2025/12/01 12:01:43 by marcheva         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "minishell.h"
 
-pid_t   run_commands_list(t_cmd *cmd_list, t_mini *mini)
+pid_t	run_commands_list(t_cmd *cmd_list, t_mini *mini)
 {
-	t_cmd   *cmd;
-	int     prev_fd;
-	pid_t   last_pid;
-	int     status;
+	t_cmd	*cmd;
+	int		prev_fd;
+	pid_t	last_pid;
+	int		status;
 
 	cmd = cmd_list;
 	prev_fd = STDIN_FILENO;
@@ -33,6 +21,7 @@ pid_t   run_commands_list(t_cmd *cmd_list, t_mini *mini)
 	return (last_pid);
 }
 
+
 void    run_middle_list(t_cmd *cmd, int *prev_fd, t_mini *mini)
 {
 	int     fd[2];
@@ -46,12 +35,17 @@ void    run_middle_list(t_cmd *cmd, int *prev_fd, t_mini *mini)
 	}
 	if (fork() == 0)
 	{
-		dup2(*prev_fd, STDIN_FILENO);
+		ft_redirection(cmd, mini);
+		if (!cmd->here_doc)
+		{
+			if (*prev_fd != STDIN_FILENO)
+			dup2(*prev_fd, STDIN_FILENO);
+		}
 		dup2(fd[1], STDOUT_FILENO);
-		close(*prev_fd);
+		if (*prev_fd != STDIN_FILENO)
+			close(*prev_fd);
 		close(fd[0]);
 		close(fd[1]);
-		ft_redirection(cmd, mini);
 		if (!cmd->argv || !cmd->argv[0])
 			exit(0);
 		exec = find_exec(mini, cmd->argv[0]);
@@ -86,16 +80,25 @@ int open_outfile(t_cmd *cmd)
 	return (fd);
 }
 
-void    last_child(int prev_fd, int outfile, t_cmd *cmd, t_mini *mini)
+void last_child(int prev_fd, int outfile, t_cmd *cmd, t_mini *mini)
 {
-	char    *exec;
+	char *exec;
 
-	dup2(prev_fd, STDIN_FILENO);
-	dup2(outfile, STDOUT_FILENO);
-	close(prev_fd);
+	ft_redirection(cmd, mini);
+
+	if (!cmd->here_doc)
+	{
+		if (prev_fd != STDIN_FILENO)
+			dup2(prev_fd, STDIN_FILENO);
+	}
+	if (outfile != STDOUT_FILENO)
+		dup2(outfile, STDOUT_FILENO);
+
+	if (prev_fd != STDIN_FILENO)
+		close(prev_fd);
 	if (outfile != STDOUT_FILENO)
 		close(outfile);
-	ft_redirection(cmd, mini);
+
 	if (!cmd->argv || !cmd->argv[0])
 		exit(0);
 	exec = find_exec(mini, cmd->argv[0]);
@@ -108,6 +111,7 @@ void    last_child(int prev_fd, int outfile, t_cmd *cmd, t_mini *mini)
 	perror("execve");
 	exit(127);
 }
+
 
 pid_t   exec_last_child(int prev, t_cmd *cmd, t_mini *mini)
 {

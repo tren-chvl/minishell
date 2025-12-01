@@ -12,43 +12,49 @@
 
 #include "minishell.h"
 
-void	process_all_heredocs(t_cmd *cmds)
+void    process_all_heredocs(t_cmd *cmds)
 {
-	t_cmd	*cur;
+	t_cmd   *cur;
 
 	cur = cmds;
 	while (cur)
 	{
-		if (cur->here_doc)
+		if (cur->delimiter)
 			process_heredoc(cur);
 		cur = cur->next;
 	}
 }
 
-void	process_heredoc(t_cmd *cmd)
+void    process_heredoc(t_cmd *cmd)
 {
-	char	*line;
-	int		fd;
+    char    *line;
+    char    *tmp;
+    char    *new_tmp;
 
-	if (!cmd->here_doc)
-		return ;
-	fd = open("/tmp/minishell_here_doc",
-			O_CREAT | O_TRUNC | O_WRONLY, 0600);
-	if (fd == -1)
-		return (perror("open"));
-	while (1)
-	{
-		line = readline("> ");
-		if (!line || !ft_strcmp(line, cmd->here_doc))
-		{
-			free(line);
-			break ;
-		}
-		write(fd, line, ft_strlen(line));
-		write(fd, "\n", 1);
-		free(line);
-	}
-	close(fd);
-	cmd->intfile = ft_strdup("/tmp/minishell_here_doc");
-	cmd->here_doc = NULL;
+    tmp = NULL;
+    while (1)
+    {
+        line = readline("> ");
+        if (!line || !ft_strcmp(line, cmd->delimiter))
+        {
+            free(line);
+            break;
+        }
+        if (tmp == NULL)
+            new_tmp = ft_strjoin("", line);
+        else
+            new_tmp = ft_strjoin(tmp, line);
+        free(tmp);
+        tmp = new_tmp;
+        new_tmp = ft_strjoin(tmp, "\n");
+        free(tmp);
+        tmp = new_tmp;
+        free(line);
+    }
+    cmd->here_doc = tmp;
 }
+
+
+
+
+

@@ -56,12 +56,7 @@ void	write_env(char **str, int start, int lenght, char *value)
 {
 	char	*temp;
 	char	*new;
-	char	*val;
 
-	if (value)
-		val = value;
-	else
-		val = "";
 	(*str)[start] = '\0';
 	temp = ft_strjoin(*str, value);
 	new = ft_strjoin(temp, &(*str)[lenght]);
