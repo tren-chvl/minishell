@@ -6,7 +6,7 @@
 /*   By: dedavid <dedavid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/12 20:58:37 by zcadinot          #+#    #+#             */
-/*   Updated: 2025/11/22 12:26:00 by dedavid          ###   ########.fr       */
+/*   Updated: 2025/12/01 14:48:42 by dedavid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,14 +18,14 @@
 # include <stdio.h>
 # include <limits.h>
 
-#include <libft_char.h>
-#include "libft_memory.h"
-#include "libft_string.h"
-#include "libft_length.h"
-#include "libft_convert.h"
-#include "libft_io.h"
-#include "libft_list.h"
-#include "libft_printf.h"
-#include "libft_gnl.h"
+# include <libft_char.h>
+# include "libft_memory.h"
+# include "libft_string.h"
+# include "libft_length.h"
+# include "libft_convert.h"
+# include "libft_io.h"
+# include "libft_list.h"
+# include "libft_printf.h"
+# include "libft_gnl.h"
 
 #endif

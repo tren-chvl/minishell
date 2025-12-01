@@ -6,12 +6,12 @@
 /*   By: dedavid <dedavid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/21 09:58:15 by dedavid           #+#    #+#             */
-/*   Updated: 2025/11/22 13:10:35 by dedavid          ###   ########.fr       */
+/*   Updated: 2025/12/01 14:47:34 by dedavid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef FT_PRINTF_H
-# define FT_PRINTF_H
+#ifndef LIBFT_PRINTF_H
+# define LIBFT_PRINTF_H
 
 # include <stdarg.h>
 # include <unistd.h>

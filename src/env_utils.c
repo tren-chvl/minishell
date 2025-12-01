@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   env_utils.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dedavid <dedavid@student.42.fr>            +#+  +:+       +#+        */
+/*   By: marcheva <marcheva@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/25 10:23:57 by dedavid           #+#    #+#             */
-/*   Updated: 2025/11/25 17:10:37 by dedavid          ###   ########.fr       */
+/*   Updated: 2025/12/01 08:51:36 by marcheva         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <minishell.h>
+#include "minishell.h"
 
 t_env	*find_env(t_list *list, char *name)
 {

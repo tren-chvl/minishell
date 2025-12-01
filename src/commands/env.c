@@ -6,7 +6,7 @@
 /*   By: dedavid <dedavid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/25 10:47:00 by dedavid           #+#    #+#             */
-/*   Updated: 2025/11/26 14:16:45 by dedavid          ###   ########.fr       */
+/*   Updated: 2025/12/01 15:01:49 by dedavid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ char	*add_env(t_mini *mini, char *name, char *value)
 {
 	t_env	*backup;
 	char	*old;
-	
+
 	backup = find_env(mini->env, name);
 	if (backup)
 	{

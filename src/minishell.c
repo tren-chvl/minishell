@@ -6,17 +6,16 @@
 /*   By: marcheva <marcheva@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 15:41:16 by dedavid           #+#    #+#             */
-/*   Updated: 2025/11/27 16:04:51 by marcheva         ###   ########.fr       */
+/*   Updated: 2025/12/01 15:31:59 by marcheva         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../includes/minishell.h"
+#include "minishell.h"
 
 
-void	run_shell(t_mini *mini)
+ void run_shell(t_mini *mini)
 {
 	char	*line;
-	char	**tab;
 	int		i;
 	t_cmd	*cmd;
 
@@ -25,22 +24,16 @@ void	run_shell(t_mini *mini)
 	setup_signals();
 	while (1)
 	{
-		line = readline("ft_suicide $");
+		line = readline("ft_suicide $ ");
 		if (ctrl_d(mini, line))
 			break ;
 		if (*line)
 		{
-			tab = tabpara(line);
-			cmd = parse_command(tab,mini);
+			cmd = parse_command_line(line);
+			replace_env(mini, cmd);
+			process_all_heredocs(cmd);
 			exec_cmd(cmd, mini);
 			free_cmd(cmd);
-			i = 0;
-			while (tab[i])
-			{
-				free(tab[i]);
-				i++;
-			}
-			free(tab);
 			add_history(line);
 		}
 		free(line);
@@ -74,4 +67,5 @@ int	main(int ac, char **av, char **envp)
 	fill_env(mini, envp);
 	run_shell(mini);
 	free_mini(mini);
+	return (0);
 }

@@ -6,11 +6,11 @@
 /*   By: marcheva <marcheva@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/26 09:40:18 by marcheva          #+#    #+#             */
-/*   Updated: 2025/11/27 13:32:29 by marcheva         ###   ########.fr       */
+/*   Updated: 2025/12/01 11:50:33 by marcheva         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/minishell.h"
+#include "minishell.h"
 
 int	ft_signe(char c)
 {
@@ -25,44 +25,27 @@ int	ft_isspace(char c)
 	return (0);
 }
 
-char	*ft_operator(char *line, int *i)
+int	is_builtin(char *cmd)
 {
-	char	*test;
-
-	if ((line[*i] == '>' && line[*i + 1] == '>')
-		|| (line[*i] == '<' && line[*i + 1] == '<'))
-	{
-		test = ft_substr(line,*i, 2);
-		*i += 2;
-	}
-	else
-	{
-		test = ft_substr(line, *i, 1);
-		(*i)++;
-	}
-	return (test);
-}
-
-char	**tabpara(char *line)
-{
-	char	**tab;
+	char	*build[8];
 	int		i;
-	int		j;
 
 	i = 0;
-	j = 0;
-	tab = malloc(sizeof(char *) * 1000000);
-	if (!tab)
-		return (NULL);
-	while (line[i])
+	if (!cmd)
+		return (0);
+	build[0] = "cd";
+	build[1] = "echo";
+	build[2] = "env";
+	build[3] = "exit";
+	build[4] = "export";
+	build[5] = "pwd";
+	build[6] = "unset";
+	build[7] = NULL;
+	while (build[i])
 	{
-		if (ft_isspace(line[i]))
-			i++;
-		else if (ft_signe(line[i]))
-			tab[j++] = ft_operator(line, &i);
-		else
-			tab[j++] = get_command(line, &i);
+		if (!ft_strcmp(cmd, build[i]))
+			return (1);
+		i++;
 	}
-	tab[j] = NULL;
-	return (tab);
+	return (0);
 }

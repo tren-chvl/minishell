@@ -6,7 +6,7 @@
 /*   By: marcheva <marcheva@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 10:06:21 by marcheva          #+#    #+#             */
-/*   Updated: 2025/11/24 09:40:24 by marcheva         ###   ########.fr       */
+/*   Updated: 2025/12/01 10:05:32 by marcheva         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,15 +34,15 @@ void	exec_commande(char *cmd, char **envp)
 	safe_execve(path, split, envp);
 }
 
-int	main(int argc, char **argv, char **envp)
-{
-	int	ret;
+// int	main(int argc, char **argv, char **envp)
+// {
+// 	int	ret;
 
-	if (argc < 5)
-		return (error_msg("error argument :( "));
-	if (ft_strcmp_pp(argv[1], "here_doc") == 0)
-		ret = here_doc(argc, argv, envp);
-	else
-		ret = pipex(argc, argv, envp);
-	return (ret);
-}
+// 	if (argc < 5)
+// 		return (error_msg("error argument :( "));
+// 	if (ft_strcmp_pp(argv[1], "here_doc") == 0)
+// 		ret = here_doc(argc, argv, envp);
+// 	else
+// 		ret = pipex(argc, argv, envp);
+// 	return (ret);
+// }

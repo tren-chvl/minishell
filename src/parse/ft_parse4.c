@@ -6,100 +6,54 @@
 /*   By: marcheva <marcheva@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/27 13:57:38 by marcheva          #+#    #+#             */
-/*   Updated: 2025/11/27 16:29:30 by marcheva         ###   ########.fr       */
+/*   Updated: 2025/12/01 13:58:43 by marcheva         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-char	*get_env_value(t_env *env,char *name)
-{
-	t_env	*tmp;
 
-	if (!env || !name)
-		return (NULL);
-	tmp = env;
-	while (tmp)
+char *get_path_value(t_list *env)
+{
+	t_env	*var;
+
+	while (env)
 	{
-		if (!ft_strcmp(tmp->name, name))
-				return (tmp->value);
-			tmp = tmp->next;
+		var = (t_env *)env->content;
+		if (!ft_strcmp(var->name, "PATH"))
+			return (var->value);
+		env = env->next;
 	}
 	return (NULL);
 }
-
-char *find_exec(t_mini *mini, char *cmd)
+void normal_path(char **paths)
 {
-	char    **paths;
-	char    *test;
-	int     i;
+	int		i;
+	char	*tmp;
 
-	if (!cmd || !*cmd)
-		return (NULL);
-	if (ft_strchr(cmd, '/'))
-	{
-		if (access(cmd, X_OK) == 0)
-			return (ft_strdup(cmd));
-		return (NULL);
-	}
-	paths = get_env_path(mini->env);
-	if (!paths)
-		return (NULL);
 	i = 0;
 	while (paths[i])
 	{
-		test = ft_strjoin(paths[i], cmd);
-		if (access(test, X_OK) == 0)
+		if (paths[i][ft_strlen(paths[i]) - 1] != '/')
 		{
-			free_tab(paths);
-			return (test);
+			tmp = ft_strjoin(paths[i], "/");
+			free(paths[i]);
+			paths[i] = tmp;
 		}
-		free(test);
 		i++;
 	}
-	free_tab(paths);
-	return (NULL);
 }
-
-
-int commande_not_found(t_cmd *cmd, char *exec, t_mini *mini)
+char	**get_env_path(t_list *env)
 {
-	if (!exec)
-	{
-		ft_printf("minishell : %s: command not found\n",cmd->argv[0]);
-		mini->last = 127;
-		return (1);
-	}
-	return (0);
-}
-void exec_no_build(t_cmd *cmd, t_mini *mini)
-{
-	pid_t	pid;
-	int		statut;
-	char	*exec;
+	char	*path;
+	char	**paths;
 
-	exec = find_exec(mini,cmd->argv[0]);
-	if (commande_not_found(cmd, exec, mini))
-		return ;
-	pid = fork();
-	if (pid == -1)
-	{
-		perror("fork");
-		return ;
-	}
-	if (pid == 0)
-	{
-		ft_redirection(cmd, mini);
-		 if (execve(exec, cmd->argv,mini->envp) == -1)
-		 {
-			perror("execve");
-			exit(127);
-		 }
-	}
-	else
-    {
-        waitpid(pid, &statut, 0);
-        mini->last = WEXITSTATUS(statut);
-	}
-	free(exec);
+	path = get_path_value(env);
+	if (!path)
+		return (NULL);
+	paths = ft_split(path, ':');
+	if (!paths)
+		return (NULL);
+	normal_path(paths);
+	return (paths);
 }

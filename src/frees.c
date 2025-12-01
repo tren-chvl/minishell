@@ -6,11 +6,11 @@
 /*   By: marcheva <marcheva@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 16:43:17 by dedavid           #+#    #+#             */
-/*   Updated: 2025/11/27 13:29:48 by dedavid          ###   ########.fr       */
+/*   Updated: 2025/12/01 09:09:41 by marcheva         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <minishell.h>
+#include "minishell.h"
 
 void	free_env(void *content)
 {
@@ -31,4 +31,42 @@ void	free_mini(t_mini *mini)
 	free(mini->path);
 	free(mini);
 	rl_clear_history();
+}
+
+void free_tab(char **tab)
+{
+	int i;
+
+	i = 0;
+	if (!tab)
+		return ;
+	while (tab[i])
+	{
+		free(tab[i]);
+		i++;
+	}
+	 free(tab);
+}
+
+
+void free_cmd(t_cmd *cmd)
+{
+	t_cmd *tmp;
+	int j;
+
+	while (cmd)
+	{
+		tmp = cmd->next;
+		if (cmd->argv)
+		{
+			j = 0;
+			while (cmd->argv[j])
+				free(cmd->argv[j++]);
+			free(cmd->argv);
+		}
+		if (cmd->path)
+			free(cmd->path);
+		free(cmd);
+		cmd = tmp;
+	}
 }

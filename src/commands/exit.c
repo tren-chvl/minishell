@@ -6,7 +6,7 @@
 /*   By: marcheva <marcheva@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 16:41:31 by dedavid           #+#    #+#             */
-/*   Updated: 2025/11/27 13:40:59 by dedavid          ###   ########.fr       */
+/*   Updated: 2025/12/01 13:44:48 by dedavid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,10 @@ void	ft_suicide(t_mini *mini, int code, t_cmd *cmd)
 	if (cmd)
 		code = exit_parsing(cmd);
 	if (code == -1)
+	{
+		mini->prev_exit = 1;
 		return ;
+	}
 	free_mini(mini);
 	exit(code);
 }

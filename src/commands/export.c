@@ -6,7 +6,7 @@
 /*   By: marcheva <marcheva@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 17:04:33 by dedavid           #+#    #+#             */
-/*   Updated: 2025/11/27 13:47:10 by dedavid          ###   ########.fr       */
+/*   Updated: 2025/12/01 15:01:35 by dedavid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,13 +27,12 @@ void	actually_export(t_mini *mini, char *name, char *value)
 		if (value)
 			new->value = value;
 		return ;
-	}			
+	}
 	new = malloc(sizeof(t_env));
 	new->name = name;
 	new->value = value;
 	ft_lstadd_back(&mini->env, ft_lstnew(new));
 	swap_last(mini);
-
 }
 
 int	name_isvalid(char *str)
@@ -49,7 +48,8 @@ int	name_isvalid(char *str)
 	d = 0;
 	while (str[++i])
 	{
-		if (!ft_isalnum(str[i]) && str[i] != '_' && str[i] != '\'' && str[i] != '\"')
+		if (!ft_isalnum(str[i]) && str[i] != '_'
+			&& str[i] != '\'' && str[i] != '\"')
 			return (0);
 		if (str[i] == '\'')
 			s++;
@@ -66,7 +66,7 @@ int	get_end(char *str, char stop)
 	int		i;
 	int		s;
 	int		d;
-	
+
 	i = -1;
 	s = -1;
 	d = -1;
@@ -99,6 +99,7 @@ void	mini_export(t_mini *mini, t_cmd *cmd)
 		if (!name_isvalid(name))
 		{
 			ft_printf("export: '%s': not a valid identifier\n", name);
+			mini->prev_exit = 1;
 			free(name);
 			free(value);
 			continue ;

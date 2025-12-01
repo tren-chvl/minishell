@@ -6,13 +6,13 @@
 /*   By: dedavid <dedavid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/22 12:39:17 by dedavid           #+#    #+#             */
-/*   Updated: 2025/11/22 12:47:04 by dedavid          ###   ########.fr       */
+/*   Updated: 2025/12/01 14:09:28 by dedavid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <libft_string.h>
 
-int strchr_index(const char *str, char c)
+int	strchr_index(const char *str, char c)
 {
 	int	i;
 
