@@ -6,7 +6,7 @@
 /*   By: marcheva <marcheva@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/01 13:02:50 by marcheva          #+#    #+#             */
-/*   Updated: 2025/12/02 15:51:06 by marcheva         ###   ########.fr       */
+/*   Updated: 2025/12/02 16:21:25 by marcheva         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,6 +89,7 @@ t_token	*ft_token(char *line, int *ntok)
 	int		cap;
 	int		n;
 	int		i;
+	int		space;
 
 	toks = NULL;
 	cap = 0;
@@ -96,26 +97,34 @@ t_token	*ft_token(char *line, int *ntok)
 	i = 0;
 	while (line[i])
 	{
-		if (ft_isspace(line[i]))
+		space = 0;
+		while (ft_isspace(line[i]))
+		{
 			i++;
-		else if (line[i] == '>' && line[i + 1] && line[i + 1] == '>')
-			(add_token(&toks, &n, &cap, TOK_GTGT, ft_strdup(">>")), i += 2);
+			space = 1;
+		}
+		if (!line[i])
+			break;
+		if (line[i] == '>' && line[i + 1] && line[i + 1] == '>')
+			(add_token(&toks, &n, &cap, TOK_GTGT, ft_strdup(">>")), toks[n-1].bef = space, i += 2);
 		else if (line[i] == '<' && line[i + 1] && line[i + 1] == '<')
-			(add_token(&toks, &n, &cap, TOK_LTLT, ft_strdup("<<")), i += 2);
-		else if (line[i] == '|' && line[i + 1] && line[i + 1] == '|')
-			(add_token(&toks, &n, &cap, TOK_PIPE, ft_strdup("||")), i += 2);
+			(add_token(&toks, &n, &cap, TOK_LTLT, ft_strdup("<<")), toks[n-1].bef = space, i += 2);
 		else if (line[i] == '|')
-			(add_token(&toks, &n, &cap, TOK_PIPE, ft_strdup("|")), i++);
+			(add_token(&toks, &n, &cap, TOK_PIPE, ft_strdup("|")), toks[n-1].bef = space, i++);
 		else if (line[i] == '>')
-			(add_token(&toks, &n, &cap, TOK_GT, ft_strdup(">")), i++);
+			(add_token(&toks, &n, &cap, TOK_GT, ft_strdup(">")), toks[n-1].bef = space, i++);
 		else if (line[i] == '<')
-			(add_token(&toks, &n, &cap, TOK_LT, ft_strdup("<")), i++);
+			(add_token(&toks, &n, &cap, TOK_LT, ft_strdup("<")), toks[n-1].bef = space, i++);
 		else
+		{
 			add_token(&toks, &n, &cap, TOK_WORD, read_word(line, &i));
+			toks[n-1].bef = space;
+		}
 	}
 	*ntok = n;
 	return (toks);
 }
+
 
 
 

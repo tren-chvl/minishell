@@ -6,54 +6,54 @@
 /*   By: marcheva <marcheva@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/02 14:19:05 by marcheva          #+#    #+#             */
-/*   Updated: 2025/12/02 15:40:48 by marcheva         ###   ########.fr       */
+/*   Updated: 2025/12/02 16:18:07 by marcheva         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-char	*redir_error_token(t_token *toks, int i, int ntok)
-{
-	t_token	next;
-
-	if (i + 1 >= ntok)
-		return ("newline");
-	next = toks[i + 1];
-	if (next.type == TOK_WORD)
-		return (NULL);
-	if (next.type == TOK_PIPE)
-		return ("|");
-	if (next.val != NULL)
-		return (next.val);
-	if (next.type == TOK_LT)
-		return ("<");
-	if (next.type == TOK_GT)
-		return (">");
-	if (next.type == TOK_GTGT)
-		return (">>");
-	if (next.type == TOK_LTLT)
-		return ("<<");
-	return ("newline");
-}
-
 char	*redir_error_pipi(t_token *toks, int i, int ntok)
 {
-	int		count;
-	int		j;
+	int	k;
+	int	adj_count;
 
-	count = 1;
-	while (i + count < ntok && toks[i + count].type == TOK_PIPE)
-		count++;
-	j = i + count;
-	if (j >= ntok)
+	adj_count = 1;
+	k = i + 1;
+	while (k < ntok && toks[k].type == TOK_PIPE && toks[k].bef == 0)
+	{
+		adj_count++;
+		k++;
+	}
+	if (k >= ntok)
 		return ("|");
-	if (toks[j].type == TOK_WORD)
+	if (toks[k].type == TOK_WORD)
 		return (NULL);
-	if (count >= 2)
+	if (adj_count == 2 || adj_count == 3)
 		return ("||");
 	return ("|");
 }
 
+
+char	*redir_error_token(t_token *toks, int i, int ntok)
+{
+	if (i + 1 >= ntok)
+		return ("newline");
+	if (toks[i + 1].type == TOK_WORD)
+		return (NULL);
+	if (toks[i + 1].type == TOK_PIPE)
+		return ("|");
+	if (toks[i + 1].val != NULL)
+		return (toks[i + 1].val);
+	if (toks[i + 1].type == TOK_LT)
+		return ("<");
+	if (toks[i + 1].type == TOK_GT)
+		return (">");
+	if (toks[i + 1].type == TOK_GTGT)
+		return (">>");
+	if (toks[i + 1].type == TOK_LTLT)
+		return ("<<");
+	return ("newline");
+}
 char	*check_redir_syntax(t_token *toks, int ntok)
 {
 	int		i;
@@ -79,7 +79,6 @@ char	*check_redir_syntax(t_token *toks, int ntok)
 	}
 	return (NULL);
 }
-
 
 int	check_files(t_cmd *cmd, t_mini *mini)
 {
@@ -124,3 +123,4 @@ int	f_ck_redirection(t_cmd *cmd, t_mini *mini, t_token *toks, int ntok)
 		return (-1);
 	return (0);
 }
+
