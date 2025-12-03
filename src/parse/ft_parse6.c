@@ -6,7 +6,7 @@
 /*   By: marcheva <marcheva@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/01 13:02:50 by marcheva          #+#    #+#             */
-/*   Updated: 2025/12/02 16:21:25 by marcheva         ###   ########.fr       */
+/*   Updated: 2025/12/03 15:33:36 by marcheva         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,10 +38,10 @@ char	*read_word(char *line, int *i)
 	return (ft_substr(line, start, *i - start));
 }
 
-void    add_token(t_tokft *ctx, int type, char *val, int bef)
+void	add_token(t_tokft *ctx, int type, char *val, int bef)
 {
-	t_token *new;
-	size_t  old_cap;
+	t_token	*new;
+	size_t	old_cap;
 
 	if (*ctx->cap == *ctx->n)
 	{
@@ -52,7 +52,10 @@ void    add_token(t_tokft *ctx, int type, char *val, int bef)
 			*ctx->cap = old_cap * 2;
 		new = ft_realloc(*ctx->toks, old_cap, *ctx->cap, sizeof(t_token));
 		if (!new)
+		{
+			free(val);
 			return ;
+		}
 		*ctx->toks = new;
 	}
 	(*ctx->toks)[*ctx->n].type = type;
@@ -61,24 +64,24 @@ void    add_token(t_tokft *ctx, int type, char *val, int bef)
 	(*ctx->n)++;
 }
 
-int  handle_operator(char *line, int *i, int space, t_tokft *ctx)
+int	handle_operator(char *line, int *i, int space, t_tokft *ctx)
 {
 	if (line[*i] == '>' && line[*i + 1] == '>')
-		return (*i += 2, add_token(ctx, TOK_GTGT, ft_strdup(">>"), space), 1);
+		return (*i += 2, add_token(ctx, TOK_GTGT, NULL, space), 1);
 	if (line[*i] == '<' && line[*i + 1] == '<')
-		return (*i += 2, add_token(ctx, TOK_LTLT, ft_strdup("<<"), space), 1);
+		return (*i += 2, add_token(ctx, TOK_LTLT, NULL, space), 1);
 	if (line[*i] == '|')
-		return (*i += 1, add_token(ctx, TOK_PIPE, ft_strdup("|"), space), 1);
+		return (*i += 1, add_token(ctx, TOK_PIPE, NULL, space), 1);
 	if (line[*i] == '>')
-		return (*i += 1, add_token(ctx, TOK_GT, ft_strdup(">"), space), 1);
+		return (*i += 1, add_token(ctx, TOK_GT, NULL, space), 1);
 	if (line[*i] == '<')
-		return (*i += 1, add_token(ctx, TOK_LT, ft_strdup("<"), space), 1);
+		return (*i += 1, add_token(ctx, TOK_LT, NULL, space), 1);
 	return (0);
 }
 
-t_token *ft_token(char *line, int *ntok)
+t_token	*ft_token(char *line, int *ntok)
 {
-	t_fttokinit p;
+	t_fttokinit	p;
 
 	p.line = line;
 	p.toks = NULL;
@@ -101,11 +104,11 @@ t_token *ft_token(char *line, int *ntok)
 	return (p.toks);
 }
 
-void    para_argv(t_cmd *cmd, char *s)
+void	para_argv(t_cmd *cmd, char *s)
 {
-	int     len;
-	int     i;
-	char    **newv;
+	int		len;
+	int		i;
+	char	**newv;
 
 	len = 0;
 	if (cmd->argv)
@@ -122,88 +125,8 @@ void    para_argv(t_cmd *cmd, char *s)
 		newv[i] = cmd->argv[i];
 		i++;
 	}
-	newv[len] = ft_strdup(s);
+	newv[len] = s;
 	newv[len + 1] = NULL;
 	free(cmd->argv);
 	cmd->argv = newv;
-}
-
-void handle_outfile(t_cmd *res, t_token *toks, int *i)
-{
-	res->outfile = toks[*i + 1].val;
-	if (toks[*i].type == TOK_GTGT)
-		res->append = 1;
-	toks[*i + 1].val = NULL;
-	(*i)++;
-}
-
-void handle_infile(t_cmd *res, t_token *toks, int *i)
-{
-	res->intfile = toks[*i + 1].val;
-	toks[*i + 1].val = NULL;
-	(*i)++;
-}
-
-void handle_delimiter(t_cmd *res, t_token *toks, int *i)
-{
-	res->delimiter = toks[*i + 1].val;
-	toks[*i + 1].val = NULL;
-	(*i)++;
-}
-
-
-void    handle_redir(t_cmd *res, t_token *toks, int nbtok, int *i)
-{
-	if ((toks[*i].type == TOK_GT || toks[*i].type == TOK_GTGT)
-		&& *i + 1 < nbtok && toks[*i + 1].type == TOK_WORD)
-		handle_outfile(res, toks, i);
-	else if (toks[*i].type == TOK_LT
-		&& *i + 1 < nbtok && toks[*i + 1].type == TOK_WORD)
-		handle_infile(res, toks, i);
-	else if (toks[*i].type == TOK_LTLT
-		&& *i + 1 < nbtok && toks[*i + 1].type == TOK_WORD)
-		handle_delimiter(res, toks, i);
-	else
-		res->delimiter = NULL;
-}
-
-void parse_tokens(t_token *toks, int ntok, t_cmd **head, t_cmd **cur)
-{
-	int i;
-
-	i = 0;
-	while (i < ntok)
-	{
-		if (!*cur)
-		{
-			*cur = ft_calloc(1, sizeof(t_cmd));
-			if (!*head)
-				*head = *cur;
-		}
-		if (toks[i].type == TOK_PIPE)
-		{
-			(*cur)->next = ft_calloc(1, sizeof(t_cmd));
-			*cur = (*cur)->next;
-		}
-		else if (toks[i].type == TOK_WORD)
-		{
-			para_argv(*cur, toks[i].val);
-			toks[i].val = NULL;
-		}
-		else
-			handle_redir(*cur, toks, ntok, &i);
-		i++;
-	}
-}
-
-t_cmd   *parse_command_line(char *line)
-{
-	int     ntok;
-	t_token *toks;
-	t_cmd   *head = NULL;
-	t_cmd   *cur = NULL;
-
-	toks = ft_token(line, &ntok);
-	parse_tokens(toks, ntok, &head, &cur);
-	return (head);
 }

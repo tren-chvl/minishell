@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parse_env.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcheva <marcheva@student.42.fr>          +#+  +:+       +#+        */
+/*   By: dedavid <dedavid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/28 08:58:38 by dedavid           #+#    #+#             */
-/*   Updated: 2025/12/02 10:30:39 by dedavid          ###   ########.fr       */
+/*   Updated: 2025/12/03 11:52:27 by dedavid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,19 +27,6 @@ int	find_env_symbol(char *str, int offset)
 	return (-1);
 }
 
-void	write_env(char **str, int start, int lenght, char *value)
-{
-	char	*temp;
-	char	*new;
-
-	(*str)[start] = '\0';
-	temp = ft_strjoin(*str, value);
-	new = ft_strjoin(temp, &(*str)[lenght]);
-	free(temp);
-	free(*str);
-	*str = new;
-}
-
 int	find_end(char *str, int start)
 {
 	int	i;
@@ -55,9 +42,34 @@ int	find_end(char *str, int start)
 	return (i);
 }
 
-void	str_hasenv(t_mini *mini, char **str_ptr)
+void	write_env(t_mini *mini, char **str, int start, char *name)
 {
 	t_env	*env;
+	char	*temp;
+	char	*new;
+	char	*value;
+	int		lenght;
+
+	env = find_env(mini->env, name);
+	if (env)
+		value = env->value;
+	else if (ft_strcmp(name, "?") == 0)
+		value = ft_itoa(mini->prev_exit);
+	else
+		return ;
+	lenght = find_end(*str, start) - start;
+	(*str)[start] = '\0';
+	temp = ft_strjoin(*str, value);
+	new = ft_strjoin(temp, &(*str)[lenght]);
+	free(temp);
+	free(*str);
+	if (!env)
+		free(value);
+	*str = new;
+}
+
+void	str_hasenv(t_mini *mini, char **str_ptr)
+{
 	char	*name;
 	char	*str;
 	int		start;
@@ -69,11 +81,7 @@ void	str_hasenv(t_mini *mini, char **str_ptr)
 	{
 		i = find_end(str, start);
 		name = ft_substr(str, start + 1, i - start - 1);
-		env = find_env(mini->env, name);
-		if (env)
-			write_env(str_ptr, start, i, env->value);
-		else if (ft_strcmp(name, "?") == 0)
-			write_env(str_ptr, start, i, ft_itoa(mini->prev_exit));
+		write_env(mini, str_ptr, start, name);
 		free(name);
 		str = *str_ptr;
 		start = find_env_symbol(str, start + 1);

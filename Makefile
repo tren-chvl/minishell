@@ -10,24 +10,23 @@
 #                                                                              #
 # **************************************************************************** #
 
-NAME    := minishell
-CC      := cc
-CFLAGS  := -Wall -Wextra -Werror -g -Iincludes -ILibft/includes
-SRC_DIR := src
-SRCS    := $(shell find $(SRC_DIR) -type f -name "*.c") \
+NAME	:= minishell
+CC		:= cc
+CFLAGS	:= -Wall -Wextra -Werror -g -Iincludes -ILibft/includes -lreadline
+SRC_DIR	:= src
+SRCS	:= $(shell find $(SRC_DIR) -type f -name "*.c") \
 		pipex/ft_path.c \
 		pipex/ft_utils.c \
 		pipex/ft_utils2.c \
 		pipex/get_next_line_utils.c \
 		pipex/ft_split.c
-LIBS    := Libft/libft.a
-LDFLAGS := -lreadline -lncurses
+LIBS	:= Libft/libft.a
 
 all: $(NAME)
 
 $(NAME):
 	make -C Libft
-	$(CC) $(CFLAGS) $(SRCS) $(LIBS) $(LDFLAGS) -o $(NAME)
+	$(CC) $(CFLAGS) $(SRCS) $(LIBS) -o $(NAME)
 
 clean:
 	make clean -C Libft

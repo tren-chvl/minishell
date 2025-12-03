@@ -6,7 +6,7 @@
 /*   By: marcheva <marcheva@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/02 10:57:10 by dedavid           #+#    #+#             */
-/*   Updated: 2025/12/02 16:16:19 by marcheva         ###   ########.fr       */
+/*   Updated: 2025/12/03 16:05:27 by marcheva         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,22 +66,21 @@ typedef struct s_token
 
 typedef struct s_tokft
 {
-    t_token **toks;
-    int      *n;
-    int      *cap;
-}   t_tokft;
+	t_token	**toks;
+	int		*n;
+	int		*cap;
+}	t_tokft;
 
 typedef struct s_fttokinit
 {
-    char    *line;
-    t_token *toks;
-    int     cap;
-    int     n;
-    int     i;
-    int     space;
-    t_tokft tokctx;
-}   t_fttokinit;
-
+	char	*line;
+	t_token	*toks;
+	int		cap;
+	int		n;
+	int		i;
+	int		space;
+	t_tokft	tokctx;
+}	t_fttokinit;
 
 typedef struct s_mini
 {
@@ -106,14 +105,6 @@ typedef struct s_cmd
 	struct s_cmd	*next;
 }	t_cmd;
 
-typedef struct s_envpath
-{
-	char	*path;
-	char	**paths;
-	int		i;
-	char	*tmp_str;
-}	t_envpath;
-
 void	free_mini(t_mini *mini);
 
 //commands functions
@@ -131,8 +122,8 @@ t_env	*get_lowest(t_list *list);
 t_env	*get_highest(t_list *list);
 void	print_env_alpha(t_mini *mini);
 int		arg_count(t_cmd *cmd);
-int skip_spaces(char *line, int *i);
-void    *ft_realloc(void *ptr, size_t old_count, size_t new_count, size_t elem_size);
+void	*ft_realloc(void *ptr, size_t ol_cnt, size_t new_count, size_t el_size);
+int		skip_spaces(char *line, int *i);
 
 //debug functions
 void	print_env(t_mini *mini);
@@ -152,11 +143,13 @@ void	disable_echoctl(void);
 
 //free functions
 void	free_env(void *content);
-void free_token(t_token *token, int nbtok);
+void	free_token(t_token *token, int nbtok);
 void	free_tab(char **tab);
 void	free_cmd(t_cmd *cmd);
 
 //parsing
+void	parse_tokens(t_token *toks, int ntok, t_cmd **head, t_cmd **cur);
+void	handle_redir(t_cmd *res, t_token *toks, int nbtok, int *i);
 int		open_outfile(t_cmd *cmd);
 char	*read_word(char *line, int *i);
 void	para_argv(t_cmd *cmd, char *s);
@@ -181,5 +174,8 @@ pid_t	exec_last_child(int prev, t_cmd *cmd, t_mini *mini);
 pid_t	run_commands_list(t_cmd *cmd_list, t_mini *mini);
 int		ft_isspace(char c);
 t_cmd	*parse_command_line(char *line);
-void    handle_redir(t_cmd *res, t_token *toks, int nbtok, int *i);
+
+//utils
+void	print_error(char *origine, char *cause);
+
 #endif

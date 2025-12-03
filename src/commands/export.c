@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   export.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcheva <marcheva@student.42.fr>          +#+  +:+       +#+        */
+/*   By: dedavid <dedavid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 17:04:33 by dedavid           #+#    #+#             */
-/*   Updated: 2025/12/02 10:33:07 by dedavid          ###   ########.fr       */
+/*   Updated: 2025/12/03 11:04:06 by dedavid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,7 +99,7 @@ void	mini_export(t_mini *mini, t_cmd *cmd)
 			value = NULL;
 		if (!name_isvalid(name))
 		{
-			ft_printf("export: '%s': not a valid identifier\n", name);
+			ft_printferror("export: '%s': not a valid identifier\n", name);
 			mini->prev_exit = 1;
 			free(name);
 			free(value);

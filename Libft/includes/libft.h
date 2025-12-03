@@ -6,7 +6,7 @@
 /*   By: dedavid <dedavid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/12 20:58:37 by zcadinot          #+#    #+#             */
-/*   Updated: 2025/12/02 11:08:42 by dedavid          ###   ########.fr       */
+/*   Updated: 2025/12/03 11:00:42 by dedavid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@
 # include "libft_io.h"
 # include "libft_list.h"
 # include "libft_printf.h"
+# include "libft_printferror.h"
 # include "libft_gnl.h"
 # include "libft_math.h"
 

@@ -6,7 +6,7 @@
 /*   By: dedavid <dedavid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 15:30:37 by dedavid           #+#    #+#             */
-/*   Updated: 2025/12/02 10:55:28 by dedavid          ###   ########.fr       */
+/*   Updated: 2025/12/03 11:58:55 by dedavid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,9 @@ void	cd(t_mini *mini, char *path)
 			go_back(mini);
 		else
 			add_to_path(mini, changes[i]);
+		free(changes[i]);
 	}
+	free(changes);
 }
 
 void	mini_cd(t_mini *mini, t_cmd *cmd)
@@ -64,7 +66,7 @@ void	mini_cd(t_mini *mini, t_cmd *cmd)
 	char	*path;
 	char	*old;
 
-	if (arg_count(cmd) > 1)
+	if (arg_count(cmd) > 2)
 	{
 		perror(strerror(1));
 		mini->prev_exit = 1;
@@ -79,7 +81,7 @@ void	mini_cd(t_mini *mini, t_cmd *cmd)
 	cd(mini, path);
 	if (chdir(mini->path) == -1)
 	{
-		ft_printf("minishell: cd: %s: %s\n", path, strerror(errno));
+		ft_printferror("cd: %s: %s\n", path, strerror(errno));
 		free(mini->path);
 		mini->path = old;
 		mini->prev_exit = errno;

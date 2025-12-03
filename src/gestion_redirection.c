@@ -6,7 +6,7 @@
 /*   By: marcheva <marcheva@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/02 14:19:05 by marcheva          #+#    #+#             */
-/*   Updated: 2025/12/02 16:18:07 by marcheva         ###   ########.fr       */
+/*   Updated: 2025/12/03 10:43:29 by marcheva         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ char	*redir_error_pipi(t_token *toks, int i, int ntok)
 	}
 	if (adj_count >= 2)
 		return ("||");
-	if (i == 0 || i + 1 >= ntok) 
+	if (i == 0 || i + 1 >= ntok)
 		return ("|");
 	return (NULL);
 }

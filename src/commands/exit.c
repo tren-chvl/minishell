@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exit.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcheva <marcheva@student.42.fr>          +#+  +:+       +#+        */
+/*   By: dedavid <dedavid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 16:41:31 by dedavid           #+#    #+#             */
-/*   Updated: 2025/12/01 13:44:48 by dedavid          ###   ########.fr       */
+/*   Updated: 2025/12/03 11:04:11 by dedavid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,13 +23,13 @@ int	exit_parsing(t_cmd *cmd)
 	{
 		if (i == 1 && !str_isdigit(tab[i]))
 		{
-			ft_printf("exit: %s: numeric argument required\n", tab[i]);
+			ft_printferror("exit: %s: numeric argument required\n", tab[i]);
 			return (2);
 		}
 	}
 	if (i != 2)
 	{
-		ft_printf("exit: too many arguments\n");
+		ft_printferror("exit: too many arguments\n");
 		return (-1);
 	}
 	return ((unsigned char) ft_atoi(tab[1]));

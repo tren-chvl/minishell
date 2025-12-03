@@ -1,32 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   env.c                                              :+:      :+:    :+:   */
+/*   libft_printferror.h                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dedavid <dedavid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/11/25 10:47:00 by dedavid           #+#    #+#             */
-/*   Updated: 2025/12/03 11:01:13 by dedavid          ###   ########.fr       */
+/*   Created: 2025/10/21 09:58:15 by dedavid           #+#    #+#             */
+/*   Updated: 2025/12/03 10:59:54 by dedavid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <minishell.h>
+#ifndef LIBFT_PRINTFERROR_H
+# define LIBFT_PRINTFERROR_H
 
-void	mini_env(t_mini *mini)
-{
-	t_env	*env;
-	t_list	*list;
+# include <stdarg.h>
+# include <unistd.h>
+# include <libft_io.h>
+# include <libft_length.h>
 
-	list = mini->env;
-	if (!list)
-		return ;
-	while (list)
-	{
-		env = list->content;
-		if (!env)
-			continue ;
-		if (env->value)
-			ft_printf("%s=%s\n", env->name, env->value);
-		list = list->next;
-	}
-}
+int	handle_cerror(va_list list);
+int	handle_serror(va_list list);
+int	handle_derror(va_list list);
+int	handle_ierror(va_list list);
+int	handle_uerror(va_list list);
+
+int	ft_printferror(const char *str, ...);
+
+#endif

@@ -6,11 +6,22 @@
 /*   By: marcheva <marcheva@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 15:41:16 by dedavid           #+#    #+#             */
-/*   Updated: 2025/12/02 13:01:13 by marcheva         ###   ########.fr       */
+/*   Updated: 2025/12/03 16:04:51 by marcheva         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+t_cmd	*parse_command_line_from_tokens(t_token *toks, int ntok)
+{
+	t_cmd	*head;
+	t_cmd	*cur;
+
+	head = NULL;
+	cur = NULL;
+	parse_tokens(toks, ntok, &head, &cur);
+	return (head);
+}
 
 void	after_run(t_mini *mini, char *line)
 {
@@ -19,9 +30,12 @@ void	after_run(t_mini *mini, char *line)
 	int		nbtok;
 
 	token = ft_token(line, &nbtok);
-	cmd = parse_command_line(line);
+	cmd = parse_command_line_from_tokens(token, nbtok);
 	if (!cmd)
+	{
+		free_token(token, nbtok);
 		return ;
+	}
 	if (f_ck_redirection(cmd, mini, token, nbtok) != 0)
 	{
 		free_cmd(cmd);
@@ -45,13 +59,19 @@ void	run_shell(t_mini *mini)
 	while (1)
 	{
 		line = readline("ft_suicide $ ");
-		if (ctrl_d(mini, line))
+		if (!line)
 			break ;
+		if (ctrl_d(mini, line))
+		{
+			free(line);
+			break ;
+		}
 		if (*line)
 			after_run(mini, line);
 		free(line);
 	}
 }
+
 void	getpath(t_mini *mini)
 {
 	int		i;
@@ -75,6 +95,7 @@ int	main(int ac, char **av, char **envp)
 	mini = malloc(sizeof(t_mini));
 	mini->env = NULL;
 	mini->envp = envp;
+	mini->prev_exit = 0;
 	getpath(mini);
 	fill_env(mini, envp);
 	run_shell(mini);

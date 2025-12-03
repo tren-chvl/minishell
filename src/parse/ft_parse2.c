@@ -6,7 +6,7 @@
 /*   By: marcheva <marcheva@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/26 13:12:12 by marcheva          #+#    #+#             */
-/*   Updated: 2025/12/02 11:37:41 by marcheva         ###   ########.fr       */
+/*   Updated: 2025/12/03 10:44:10 by marcheva         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,8 +90,8 @@ void	exec_no_build(t_cmd *cmd, t_mini *mini)
 	}
 	if (pid == 0)
 		run_child(cmd, mini, exec);
-	else 
-	{ 
+	else
+	{
 		waitpid(pid, &statut, 0);
 		mini->last = WEXITSTATUS(statut);
 	}

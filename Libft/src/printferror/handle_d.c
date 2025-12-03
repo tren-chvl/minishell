@@ -1,32 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   env.c                                              :+:      :+:    :+:   */
+/*   handle_d.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dedavid <dedavid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/11/25 10:47:00 by dedavid           #+#    #+#             */
-/*   Updated: 2025/12/03 11:01:13 by dedavid          ###   ########.fr       */
+/*   Created: 2025/10/21 11:34:01 by dedavid           #+#    #+#             */
+/*   Updated: 2025/12/03 10:58:55 by dedavid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <minishell.h>
+#include <libft_printferror.h>
 
-void	mini_env(t_mini *mini)
+int	handle_derror(va_list list)
 {
-	t_env	*env;
-	t_list	*list;
+	int	digit;
 
-	list = mini->env;
-	if (!list)
-		return ;
-	while (list)
-	{
-		env = list->content;
-		if (!env)
-			continue ;
-		if (env->value)
-			ft_printf("%s=%s\n", env->name, env->value);
-		list = list->next;
-	}
+	digit = va_arg(list, int);
+	putnbr_fd(digit, 2);
+	return (nbsize(digit));
 }
