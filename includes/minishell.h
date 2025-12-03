@@ -64,6 +64,25 @@ typedef struct s_token
 	int			bef;
 }	t_token;
 
+typedef struct s_tokft
+{
+    t_token **toks;
+    int      *n;
+    int      *cap;
+}   t_tokft;
+
+typedef struct s_fttokinit
+{
+    char    *line;
+    t_token *toks;
+    int     cap;
+    int     n;
+    int     i;
+    int     space;
+    t_tokft tokctx;
+}   t_fttokinit;
+
+
 typedef struct s_mini
 {
 	int		prev_exit;
@@ -112,6 +131,8 @@ t_env	*get_lowest(t_list *list);
 t_env	*get_highest(t_list *list);
 void	print_env_alpha(t_mini *mini);
 int		arg_count(t_cmd *cmd);
+int skip_spaces(char *line, int *i);
+void    *ft_realloc(void *ptr, size_t old_count, size_t new_count, size_t elem_size);
 
 //debug functions
 void	print_env(t_mini *mini);
@@ -136,8 +157,12 @@ void	free_tab(char **tab);
 void	free_cmd(t_cmd *cmd);
 
 //parsing
+int		open_outfile(t_cmd *cmd);
+char	*read_word(char *line, int *i);
+void	para_argv(t_cmd *cmd, char *s);
+void	exec_build(t_cmd *cmd, t_mini *mini);
 t_token	*ft_token(char *line, int *ntok);
-int f_ck_redirection(t_cmd *cmd, t_mini *mini, t_token *toks, int ntok);
+int		f_ck_redirection(t_cmd *cmd, t_mini *mini, t_token *toks, int ntok);
 void	str_hasenv(t_mini *mini, char **str_ptr);
 int		is_in_quotes(char *str, int pos);
 void	process_all_heredocs(t_cmd *cmds);
@@ -156,4 +181,5 @@ pid_t	exec_last_child(int prev, t_cmd *cmd, t_mini *mini);
 pid_t	run_commands_list(t_cmd *cmd_list, t_mini *mini);
 int		ft_isspace(char c);
 t_cmd	*parse_command_line(char *line);
+void    handle_redir(t_cmd *res, t_token *toks, int nbtok, int *i);
 #endif

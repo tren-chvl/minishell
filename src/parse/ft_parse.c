@@ -49,3 +49,23 @@ int	is_builtin(char *cmd)
 	}
 	return (0);
 }
+
+void	exec_build(t_cmd *cmd, t_mini *mini)
+{
+	if (!cmd)
+		return ;
+	if (!ft_strcmp(cmd->argv[0], "cd"))
+		mini_cd(mini, cmd);
+	else if (!ft_strcmp(cmd->argv[0], "export"))
+		mini_export(mini, cmd);
+	else if (!ft_strcmp(cmd->argv[0], "unset"))
+		mini_unset(mini, cmd);
+	else if (!ft_strcmp(cmd->argv[0], "exit"))
+		ft_suicide(mini, 0, cmd);
+	else if (!ft_strcmp(cmd->argv[0], "echo"))
+		mini_echo(cmd);
+	else if (!ft_strcmp(cmd->argv[0], "pwd"))
+		mini_pwd(mini);
+	else if (!ft_strcmp(cmd->argv[0], "env"))
+		mini_env(mini);
+}

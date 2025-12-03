@@ -33,10 +33,34 @@ pid_t	run_commands_list(t_cmd *cmd_list, t_mini *mini)
 	return (last_pid);
 }
 
+void	child_middle(t_cmd *cmd, int *prev_fd, int fd[2], t_mini *mini)
+{
+	char	*exec;
+
+	ft_redirection(cmd, mini);
+	if (!cmd->here_doc && *prev_fd != STDIN_FILENO)
+		dup2(*prev_fd, STDIN_FILENO);
+	dup2(fd[1], STDOUT_FILENO);
+	if (*prev_fd != STDIN_FILENO)
+		close(*prev_fd);
+	close(fd[0]);
+	close(fd[1]);
+	if (!cmd->argv || !cmd->argv[0])
+		exit(0);
+	exec = find_exec(mini, cmd->argv[0]);
+	if (!exec)
+	{
+		ft_printf("minishell: %s: command not found\n", cmd->argv[0]);
+		exit(127);
+	}
+	execve(exec, cmd->argv, mini->envp);
+	perror("execve");
+	exit(127);
+}
+
 void	run_middle_list(t_cmd *cmd, int *prev_fd, t_mini *mini)
 {
-	int		fd[2];
-	char	*exec;
+	int	fd[2];
 
 	if (pipe(fd) == -1)
 	{
@@ -45,50 +69,11 @@ void	run_middle_list(t_cmd *cmd, int *prev_fd, t_mini *mini)
 		return ;
 	}
 	if (fork() == 0)
-	{
-		ft_redirection(cmd, mini);
-		if (!cmd->here_doc)
-		{
-			if (*prev_fd != STDIN_FILENO)
-				dup2(*prev_fd, STDIN_FILENO);
-		}
-		dup2(fd[1], STDOUT_FILENO);
-		if (*prev_fd != STDIN_FILENO)
-			close(*prev_fd);
-		close(fd[0]);
-		close(fd[1]);
-		if (!cmd->argv || !cmd->argv[0])
-			exit(0);
-		exec = find_exec(mini, cmd->argv[0]);
-		if (!exec)
-		{
-			ft_printf("minishell: %s: command not found\n", cmd->argv[0]);
-			exit(127);
-		}
-		execve(exec, cmd->argv, mini->envp);
-		perror("execve");
-		exit(127);
-	}
+		child_middle(cmd, prev_fd, fd, mini);
 	if (*prev_fd != STDIN_FILENO)
 		close(*prev_fd);
 	close(fd[1]);
 	*prev_fd = fd[0];
-}
-
-int	open_outfile(t_cmd *cmd)
-{
-	int	fd;
-	int	flags;
-
-	flags = O_WRONLY | O_CREAT;
-	if (cmd->append)
-		flags |= O_APPEND;
-	else
-		flags |= O_TRUNC;
-	fd = open(cmd->outfile, flags, 0644);
-	if (fd == -1)
-		perror("open outfile");
-	return (fd);
 }
 
 void	last_child(int prev_fd, int outfile, t_cmd *cmd, t_mini *mini)

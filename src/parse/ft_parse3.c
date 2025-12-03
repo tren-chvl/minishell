@@ -28,20 +28,12 @@ char	*get_env_value(t_env *env, char *name)
 	return (NULL);
 }
 
-char	*find_exec(t_mini *mini, char *cmd)
+char	*search_in_path(t_mini *mini, char *cmd)
 {
 	char	**paths;
 	char	*test;
 	int		i;
 
-	if (!cmd || !*cmd)
-		return (NULL);
-	if (ft_strchr(cmd, '/'))
-	{
-		if (access(cmd, X_OK) == 0)
-			return (ft_strdup(cmd));
-		return (NULL);
-	}
 	paths = get_env_path(mini->env);
 	if (!paths)
 		return (NULL);
@@ -61,45 +53,15 @@ char	*find_exec(t_mini *mini, char *cmd)
 	return (NULL);
 }
 
-int	commande_not_found(t_cmd *cmd, char *exec, t_mini *mini)
+char	*find_exec(t_mini *mini, char *cmd)
 {
-	if (!exec)
+	if (!cmd || !*cmd)
+		return (NULL);
+	if (ft_strchr(cmd, '/'))
 	{
-		ft_printf("minishell : %s: command not found\n", cmd->argv[0]);
-		mini->last = 127;
-		return (1);
+		if (access(cmd, X_OK) == 0)
+			return (ft_strdup(cmd));
+		return (NULL);
 	}
-	return (0);
-}
-
-void	exec_no_build(t_cmd *cmd, t_mini *mini)
-{
-	pid_t	pid;
-	int		statut;
-	char	*exec;
-
-	exec = find_exec(mini, cmd->argv[0]);
-	if (commande_not_found(cmd, exec, mini))
-		return ;
-	pid = fork();
-	if (pid == -1)
-	{
-		perror("fork");
-		return ;
-	}
-	if (pid == 0)
-	{
-		ft_redirection(cmd, mini);
-		if (execve(exec, cmd->argv, mini->envp) == -1)
-		{
-			perror("execve");
-			return ;
-		}
-	}
-	else
-	{
-		waitpid(pid, &statut, 0);
-		mini->last = WEXITSTATUS(statut);
-	}
-	free(exec);
+	return (search_in_path(mini, cmd));
 }

@@ -24,15 +24,12 @@ char	*redir_error_pipi(t_token *toks, int i, int ntok)
 		adj_count++;
 		k++;
 	}
-	if (k >= ntok)
-		return ("|");
-	if (toks[k].type == TOK_WORD)
-		return (NULL);
-	if (adj_count == 2 || adj_count == 3)
+	if (adj_count >= 2)
 		return ("||");
-	return ("|");
+	if (i == 0 || i + 1 >= ntok) 
+		return ("|");
+	return (NULL);
 }
-
 
 char	*redir_error_token(t_token *toks, int i, int ntok)
 {
@@ -54,6 +51,7 @@ char	*redir_error_token(t_token *toks, int i, int ntok)
 		return ("<<");
 	return ("newline");
 }
+
 char	*check_redir_syntax(t_token *toks, int ntok)
 {
 	int		i;
@@ -123,4 +121,3 @@ int	f_ck_redirection(t_cmd *cmd, t_mini *mini, t_token *toks, int ntok)
 		return (-1);
 	return (0);
 }
-

@@ -95,3 +95,19 @@ void	ft_redirection(t_cmd *cmd, t_mini *mini)
 	redir_infile(cmd, mini);
 	redir_heredoc(cmd, mini);
 }
+
+int	open_outfile(t_cmd *cmd)
+{
+	int	fd;
+	int	flags;
+
+	flags = O_WRONLY | O_CREAT;
+	if (cmd->append)
+		flags |= O_APPEND;
+	else
+		flags |= O_TRUNC;
+	fd = open(cmd->outfile, flags, 0644);
+	if (fd == -1)
+		perror("open outfile");
+	return (fd);
+}

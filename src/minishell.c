@@ -12,12 +12,33 @@
 
 #include "minishell.h"
 
+void	after_run(t_mini *mini, char *line)
+{
+	t_cmd	*cmd;
+	t_token	*token;
+	int		nbtok;
+
+	token = ft_token(line, &nbtok);
+	cmd = parse_command_line(line);
+	if (!cmd)
+		return ;
+	if (f_ck_redirection(cmd, mini, token, nbtok) != 0)
+	{
+		free_cmd(cmd);
+		free_token(token, nbtok);
+		return ;
+	}
+	replace_env(mini, cmd);
+	process_all_heredocs(cmd);
+	exec_cmd(cmd, mini);
+	free_cmd(cmd);
+	free_token(token, nbtok);
+	add_history(line);
+}
+
 void	run_shell(t_mini *mini)
 {
 	char	*line;
-	t_cmd	*cmd;
-	t_token *token;
-	int		nbtok;
 
 	disable_echoctl();
 	setup_signals();
@@ -27,28 +48,10 @@ void	run_shell(t_mini *mini)
 		if (ctrl_d(mini, line))
 			break ;
 		if (*line)
-		{
-			token = ft_token(line, &nbtok);
-			cmd = parse_command_line(line);
-			if (!cmd)
-				continue;
-			if (f_ck_redirection(cmd,mini,token,nbtok) != 0)
-			{
-				free_cmd(cmd);
-				free_token(token,nbtok);
-				continue;
-			}
-			replace_env(mini, cmd);
-			process_all_heredocs(cmd);
-			exec_cmd(cmd, mini);
-			free_cmd(cmd);
-			free_token(token,nbtok);
-			add_history(line);
-		}
+			after_run(mini, line);
 		free(line);
 	}
 }
-
 void	getpath(t_mini *mini)
 {
 	int		i;
