@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   frees.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcheva <marcheva@student.42.fr>          +#+  +:+       +#+        */
+/*   By: dedavid <dedavid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 16:43:17 by dedavid           #+#    #+#             */
-/*   Updated: 2025/12/03 16:05:09 by marcheva         ###   ########.fr       */
+/*   Updated: 2025/12/04 18:22:41 by dedavid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ void	free_mini(t_mini *mini)
 {
 	ft_lstclear(&mini->env, free_env);
 	free(mini->path);
+	free_envp(mini->envp);
 	free(mini);
 	rl_clear_history();
 }

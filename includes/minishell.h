@@ -6,7 +6,7 @@
 /*   By: marcheva <marcheva@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/02 10:57:10 by dedavid           #+#    #+#             */
-/*   Updated: 2025/12/03 16:05:27 by marcheva         ###   ########.fr       */
+/*   Updated: 2025/12/05 11:52:56 by marcheva         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,14 @@ typedef struct s_env
 	struct s_env	*next;
 }	t_env;
 
+typedef enum s_redirtype
+{
+    R_OUT_TRUNC,
+    R_OUT_APPEND,
+    R_IN_FILE,
+    R_HEREDOC
+}   t_redirtype;
+
 typedef enum s_toktype
 {
 	TOK_WORD,
@@ -56,6 +64,13 @@ typedef enum s_toktype
 	TOK_LT,
 	TOK_LTLT
 }	t_toktype;
+
+typedef struct s_redict
+{
+	char			*filename;
+	int				type;
+	struct s_redict *next;
+}	t_redir;
 
 typedef struct s_token
 {
@@ -102,6 +117,7 @@ typedef struct s_cmd
 	char			*delimiter;
 	int				append;
 	int				here_fd;
+	t_redir			*redirs;
 	struct s_cmd	*next;
 }	t_cmd;
 
@@ -124,14 +140,18 @@ void	print_env_alpha(t_mini *mini);
 int		arg_count(t_cmd *cmd);
 void	*ft_realloc(void *ptr, size_t ol_cnt, size_t new_count, size_t el_size);
 int		skip_spaces(char *line, int *i);
+int		too_many_args(t_mini *mini, t_cmd *cmd);
 
 //debug functions
 void	print_env(t_mini *mini);
+void	ft_redir_error(char *path);
 
 //env functions
 void	fill_env(t_mini *mini, char **envp);
 t_env	*envnew(char *name, char *value);
 t_env	*find_env(t_list *list, char *name);
+void	free_envp(char **envp);
+char	**create_envp(t_mini *mini);
 
 //command ctrl
 void	ctrl_c(int signe);
@@ -150,7 +170,7 @@ void	free_cmd(t_cmd *cmd);
 //parsing
 void	parse_tokens(t_token *toks, int ntok, t_cmd **head, t_cmd **cur);
 void	handle_redir(t_cmd *res, t_token *toks, int nbtok, int *i);
-int		open_outfile(t_cmd *cmd);
+void	join_adjacent_words(t_token *toks, int *ntok);
 char	*read_word(char *line, int *i);
 void	para_argv(t_cmd *cmd, char *s);
 void	exec_build(t_cmd *cmd, t_mini *mini);
@@ -164,9 +184,10 @@ int		ft_signe(char c);
 int		is_builtin(char *cmd);
 void	exec_cmd(t_cmd *cmd, t_mini *mini);
 void	exec_no_build(t_cmd *cmd, t_mini *mini);
-void	replace_env(t_mini *mini, t_cmd *cmd);
+void	update_status(t_mini *mini, pid_t wpid, pid_t last_pid, int status);
+void	replace_env(t_mini *mini, t_token *line, int nbtok);
 int		is_in_quotes(char *str, int pos);
-void	ft_redirection(t_cmd *cmd, t_mini *mini);
+int		ft_redirection(t_cmd *cmd, t_mini *mini);
 char	**get_env_path(t_list *env);
 char	*find_exec(t_mini *mini, char *cmd);
 void	run_middle_list( t_cmd *cmd, int *prev_fd, t_mini *mini);
@@ -174,6 +195,7 @@ pid_t	exec_last_child(int prev, t_cmd *cmd, t_mini *mini);
 pid_t	run_commands_list(t_cmd *cmd_list, t_mini *mini);
 int		ft_isspace(char c);
 t_cmd	*parse_command_line(char *line);
+void	move_left(char *str, int pos);
 
 //utils
 void	print_error(char *origine, char *cause);

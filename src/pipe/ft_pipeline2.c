@@ -6,19 +6,19 @@
 /*   By: marcheva <marcheva@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/01 11:38:27 by marcheva          #+#    #+#             */
-/*   Updated: 2025/12/03 10:43:52 by marcheva         ###   ########.fr       */
+/*   Updated: 2025/12/05 11:39:20 by marcheva         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	redir_outfile(t_cmd *cmd, t_mini *mini)
+int	redir_outfile(t_cmd *cmd)
 {
 	int	fd;
 	int	flags;
 
 	if (!cmd->outfile)
-		return ;
+		return (0);
 	flags = O_WRONLY | O_CREAT;
 	if (cmd->append)
 		flags |= O_APPEND;
@@ -27,87 +27,95 @@ void	redir_outfile(t_cmd *cmd, t_mini *mini)
 	fd = open(cmd->outfile, flags, 0644);
 	if (fd < 0)
 	{
-		perror("open outfile");
-		mini->last = 1;
-		return ;
+		ft_redir_error(cmd->outfile);
+		return (1);
 	}
 	if (dup2(fd, STDOUT_FILENO) == -1)
 	{
-		perror("dup2 outfile");
+		ft_redir_error(cmd->outfile);
 		close(fd);
-		mini->last = 1;
-		return ;
+		return (1);
 	}
 	close(fd);
+	return (0);
 }
 
-void	redir_infile(t_cmd *cmd, t_mini *mini)
+int	redir_infile(t_cmd *cmd)
 {
 	int	fd;
 
 	if (!cmd->intfile)
-		return ;
+		return (0);
 	fd = open(cmd->intfile, O_RDONLY);
 	if (fd < 0)
 	{
-		perror("open infile");
-		mini->last = 1;
-		return ;
+		ft_redir_error(cmd->intfile);
+		return (1);
 	}
 	if (dup2(fd, STDIN_FILENO) == -1)
 	{
-		perror("dup2 infile");
+		ft_redir_error(cmd->intfile);
 		close(fd);
-		mini->last = 1;
-		return ;
+		return (1);
 	}
 	close(fd);
+	return (0);
 }
 
-void	redir_heredoc(t_cmd *cmd, t_mini *mini)
+int	redir_heredoc(t_cmd *cmd, t_mini *mini)
 {
 	int	fd[2];
 
 	if (!cmd->here_doc)
-		return ;
+		return (0);
 	if (pipe(fd) == -1)
 	{
-		perror("pipe heredoc");
-		mini->last = 1;
-		return ;
+		perror("minishell");
+		return (1);
 	}
 	str_hasenv(mini, &cmd->here_doc);
 	write(fd[1], cmd->here_doc, ft_strlen(cmd->here_doc));
 	close(fd[1]);
 	if (dup2(fd[0], STDIN_FILENO) == -1)
 	{
-		perror("dup2 heredoc");
+		perror("minishell");
 		close(fd[0]);
-		mini->last = 1;
-		return ;
+		return (1);
 	}
 	close(fd[0]);
+	return (0);
 }
 
-void	ft_redirection(t_cmd *cmd, t_mini *mini)
+
+int ft_redirection(t_cmd *cmd, t_mini *mini)
 {
-	redir_outfile(cmd, mini);
-	redir_infile(cmd, mini);
-	redir_heredoc(cmd, mini);
+	if (cmd->outfile != NULL)
+	{
+		if (redir_outfile(cmd) != 0)
+			return (1);
+	}
+	if (cmd->intfile != NULL)
+	{
+		if (redir_infile(cmd) != 0)
+			return (1);
+	}
+	if (cmd->here_doc != NULL)
+	{
+		if (redir_heredoc(cmd, mini) != 0)
+			return (1);
+	}
+	return (0);
 }
 
-int	open_outfile(t_cmd *cmd)
-{
-	int	fd;
-	int	flags;
 
-	flags = O_WRONLY | O_CREAT;
-	if (cmd->append)
-		flags |= O_APPEND;
-	else
-		flags |= O_TRUNC;
-	fd = open(cmd->outfile, flags, 0644);
-	if (fd == -1)
-		perror("open outfile");
-	return (fd);
+
+void	update_status(t_mini *mini, pid_t wpid, pid_t last_pid, int status)
+{
+	if (wpid == last_pid)
+	{
+		if (WIFEXITED(status))
+			mini->prev_exit = WEXITSTATUS(status);
+		else if (WIFSIGNALED(status))
+			mini->prev_exit = 128 + WTERMSIG(status);
+	}
 }

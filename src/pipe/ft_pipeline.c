@@ -6,7 +6,7 @@
 /*   By: marcheva <marcheva@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/01 10:18:28 by marcheva          #+#    #+#             */
-/*   Updated: 2025/12/02 12:31:50 by marcheva         ###   ########.fr       */
+/*   Updated: 2025/12/04 21:29:52 by marcheva         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ pid_t	run_commands_list(t_cmd *cmd_list, t_mini *mini)
 	int		prev_fd;
 	pid_t	last_pid;
 	int		status;
+	pid_t	wpid;
 
 	cmd = cmd_list;
 	prev_fd = STDIN_FILENO;
@@ -27,9 +28,12 @@ pid_t	run_commands_list(t_cmd *cmd_list, t_mini *mini)
 		cmd = cmd->next;
 	}
 	last_pid = exec_last_child(prev_fd, cmd, mini);
-	while (wait(&status) > 0)
-		;
-	mini->last = WEXITSTATUS(status);
+	wpid = wait(&status);
+	while (wpid > 0)
+	{
+		update_status(mini, wpid, last_pid, status);
+		wpid = wait(&status);
+	}
 	return (last_pid);
 }
 
@@ -37,10 +41,12 @@ void	child_middle(t_cmd *cmd, int *prev_fd, int fd[2], t_mini *mini)
 {
 	char	*exec;
 
-	ft_redirection(cmd, mini);
-	if (!cmd->here_doc && *prev_fd != STDIN_FILENO)
+	if (ft_redirection(cmd, mini))
+		exit(1);
+	if (!cmd->here_doc && !cmd->intfile && *prev_fd != STDIN_FILENO)
 		dup2(*prev_fd, STDIN_FILENO);
-	dup2(fd[1], STDOUT_FILENO);
+	if (!cmd->outfile)
+		dup2(fd[1], STDOUT_FILENO);
 	if (*prev_fd != STDIN_FILENO)
 		close(*prev_fd);
 	close(fd[0]);
@@ -50,7 +56,7 @@ void	child_middle(t_cmd *cmd, int *prev_fd, int fd[2], t_mini *mini)
 	exec = find_exec(mini, cmd->argv[0]);
 	if (!exec)
 	{
-		ft_printf("minishell: %s: command not found\n", cmd->argv[0]);
+		ft_printferror("minishell: %s: command not found\n", cmd->argv[0]);
 		exit(127);
 	}
 	execve(exec, cmd->argv, mini->envp);
@@ -64,8 +70,8 @@ void	run_middle_list(t_cmd *cmd, int *prev_fd, t_mini *mini)
 
 	if (pipe(fd) == -1)
 	{
-		perror("pipe");
-		mini->last = 1;
+		perror("minishell");
+		mini->prev_exit = 1;
 		return ;
 	}
 	if (fork() == 0)
@@ -76,28 +82,22 @@ void	run_middle_list(t_cmd *cmd, int *prev_fd, t_mini *mini)
 	*prev_fd = fd[0];
 }
 
-void	last_child(int prev_fd, int outfile, t_cmd *cmd, t_mini *mini)
+void	last_child(int prev_fd, t_cmd *cmd, t_mini *mini)
 {
 	char	*exec;
 
-	ft_redirection(cmd, mini);
-	if (!cmd->here_doc)
-	{
-		if (prev_fd != STDIN_FILENO)
-			dup2(prev_fd, STDIN_FILENO);
-	}
-	if (outfile != STDOUT_FILENO)
-		dup2(outfile, STDOUT_FILENO);
+	if (ft_redirection(cmd, mini))
+		exit(1);
+	if (!cmd->here_doc && !cmd->intfile && prev_fd != STDIN_FILENO)
+		dup2(prev_fd, STDIN_FILENO);
 	if (prev_fd != STDIN_FILENO)
 		close(prev_fd);
-	if (outfile != STDOUT_FILENO)
-		close(outfile);
 	if (!cmd->argv || !cmd->argv[0])
 		exit(0);
 	exec = find_exec(mini, cmd->argv[0]);
 	if (!exec)
 	{
-		ft_printf("minishell: %s: command not found\n", cmd->argv[0]);
+		ft_printferror("minishell: %s: command not found\n", cmd->argv[0]);
 		exit(127);
 	}
 	execve(exec, cmd->argv, mini->envp);
@@ -107,25 +107,18 @@ void	last_child(int prev_fd, int outfile, t_cmd *cmd, t_mini *mini)
 
 pid_t	exec_last_child(int prev, t_cmd *cmd, t_mini *mini)
 {
-	int		outfile;
 	pid_t	pid;
 
-	if (cmd->outfile)
-		outfile = open_outfile(cmd);
-	else
-		outfile = STDOUT_FILENO;
 	pid = fork();
 	if (pid == -1)
 	{
 		perror("fork");
-		mini->last = 1;
+		mini->prev_exit = 1;
 		return (-1);
 	}
 	if (pid == 0)
-		last_child(prev, outfile, cmd, mini);
+		last_child(prev, cmd, mini);
 	if (prev != STDIN_FILENO)
 		close(prev);
-	if (outfile != STDOUT_FILENO)
-		close(outfile);
 	return (pid);
 }

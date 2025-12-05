@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcheva <marcheva@student.42.fr>          +#+  +:+       +#+        */
+/*   By: dedavid <dedavid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/02 10:28:09 by dedavid           #+#    #+#             */
-/*   Updated: 2025/12/03 15:02:18 by marcheva         ###   ########.fr       */
+/*   Updated: 2025/12/04 15:08:16 by dedavid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,4 +73,13 @@ int	skip_spaces(char *line, int *i)
 		space = 1;
 	}
 	return (space);
+}
+
+void	move_left(char *str, int pos)
+{
+	int	i;
+
+	i = pos - 1;
+	while (str[++i])
+		str[i] = str[i + 1];
 }

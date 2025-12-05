@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   unset.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcheva <marcheva@student.42.fr>          +#+  +:+       +#+        */
+/*   By: dedavid <dedavid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/25 13:09:48 by dedavid           #+#    #+#             */
-/*   Updated: 2025/11/27 13:30:10 by dedavid          ###   ########.fr       */
+/*   Updated: 2025/12/04 18:21:26 by dedavid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,4 +25,6 @@ void	mini_unset(t_mini *mini, t_cmd *cmd)
 			return ;
 		ft_lstdelif(&mini->env, env, free_env);
 	}
+	free_envp(mini->envp);
+	mini->envp = create_envp(mini);
 }

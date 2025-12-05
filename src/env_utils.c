@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_utils.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcheva <marcheva@student.42.fr>          +#+  +:+       +#+        */
+/*   By: dedavid <dedavid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/25 10:23:57 by dedavid           #+#    #+#             */
-/*   Updated: 2025/12/01 08:51:36 by marcheva         ###   ########.fr       */
+/*   Updated: 2025/12/04 18:50:55 by dedavid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,4 +62,42 @@ void	fill_env(t_mini *mini, char **envp)
 			ft_lstadd_back(&env, ft_lstnew(envnew(envp[i], NULL)));
 	}
 	mini->env = env;
+}
+
+char	**create_envp(t_mini *mini)
+{
+	t_list	*list;
+	t_env	*env;
+	char	**envp;
+	char	*temp;
+	int		i;
+
+	i = 0;
+	envp = malloc(sizeof(char *) * (ft_lstsize(mini->env) + 1));
+	list = mini->env;
+	while (list)
+	{
+		env = list->content;
+		temp = ft_strjoin(env->name, "=");
+		envp[i] = temp;
+		if (env->value)
+		{
+			envp[i] = ft_strjoin(temp, env->value);
+			free(temp);
+		}
+		i++;
+		list = list->next;
+	}
+	envp[i] = NULL;
+	return (envp);
+}
+
+void	free_envp(char **envp)
+{
+	int	i;
+
+	i = -1;
+	while (envp[++i])
+		free(envp[i]);
+	free(envp);
 }

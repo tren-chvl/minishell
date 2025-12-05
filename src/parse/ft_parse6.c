@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_parse6.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcheva <marcheva@student.42.fr>          +#+  +:+       +#+        */
+/*   By: dedavid <dedavid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/01 13:02:50 by marcheva          #+#    #+#             */
-/*   Updated: 2025/12/03 15:33:36 by marcheva         ###   ########.fr       */
+/*   Updated: 2025/12/04 17:45:52 by dedavid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,25 +15,12 @@
 char	*read_word(char *line, int *i)
 {
 	int		start;
-	int		quote;
-	char	*word;
 
 	if (!line[*i])
 		return (NULL);
-	if (line[*i] == '\'' || line[*i] == '\"')
-	{
-		quote = line[*i];
-		(*i)++;
-		start = *i;
-		while (line[*i] && line[*i] != quote)
-			(*i)++;
-		word = ft_substr(line, start, *i - start);
-		if (line[*i] == quote)
-			(*i)++;
-		return (word);
-	}
 	start = *i;
-	while (line[*i] && !ft_isspace(line[*i]) && !ft_signe(line[*i]))
+	while (line[*i] && ((!ft_isspace(line[*i]) && !ft_signe(line[*i]))
+			|| is_in_quotes(line, *i)))
 		(*i)++;
 	return (ft_substr(line, start, *i - start));
 }
@@ -66,6 +53,8 @@ void	add_token(t_tokft *ctx, int type, char *val, int bef)
 
 int	handle_operator(char *line, int *i, int space, t_tokft *ctx)
 {
+	if (is_in_quotes(line, *i))
+		return (*i += 1);
 	if (line[*i] == '>' && line[*i + 1] == '>')
 		return (*i += 2, add_token(ctx, TOK_GTGT, NULL, space), 1);
 	if (line[*i] == '<' && line[*i + 1] == '<')

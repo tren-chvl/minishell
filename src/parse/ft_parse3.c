@@ -6,7 +6,7 @@
 /*   By: dedavid <dedavid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/26 16:00:50 by marcheva          #+#    #+#             */
-/*   Updated: 2025/12/02 11:16:34 by dedavid          ###   ########.fr       */
+/*   Updated: 2025/12/04 21:22:48 by dedavid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,12 +53,29 @@ char	*search_in_path(t_mini *mini, char *cmd)
 	return (NULL);
 }
 
+int	is_directory(const char *path)
+{
+	struct stat	st;
+
+	if (stat(path, &st) == 0)
+	{
+		if ((st.st_mode & S_IFMT) == S_IFDIR)
+			return (1);
+	}
+	return (0);
+}
+
 char	*find_exec(t_mini *mini, char *cmd)
 {
 	if (!cmd || !*cmd)
 		return (NULL);
 	if (ft_strchr(cmd, '/'))
 	{
+		if (is_directory(cmd))
+		{
+			errno = EISDIR;
+			return (NULL);
+		}
 		if (access(cmd, X_OK) == 0)
 			return (ft_strdup(cmd));
 		return (NULL);

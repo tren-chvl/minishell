@@ -6,7 +6,7 @@
 /*   By: dedavid <dedavid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 15:30:37 by dedavid           #+#    #+#             */
-/*   Updated: 2025/12/03 11:58:55 by dedavid          ###   ########.fr       */
+/*   Updated: 2025/12/04 23:01:29 by dedavid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,8 @@ void	cd(t_mini *mini, char *path)
 	char	**changes;
 	int		i;
 
+	if (ft_strcmp("/", path) == 0)
+		return ;
 	changes = ft_split(path, '/');
 	i = -1;
 	if (ft_strcmp("~", changes[0]) == 0)
@@ -58,6 +60,7 @@ void	cd(t_mini *mini, char *path)
 			add_to_path(mini, changes[i]);
 		free(changes[i]);
 	}
+	free(changes[i]);
 	free(changes);
 }
 
@@ -66,14 +69,13 @@ void	mini_cd(t_mini *mini, t_cmd *cmd)
 	char	*path;
 	char	*old;
 
-	if (arg_count(cmd) > 2)
-	{
-		perror(strerror(1));
-		mini->prev_exit = 1;
+	if (too_many_args(mini, cmd))
 		return ;
-	}
 	old = ft_strdup(mini->path);
-	path = cmd->argv[1];
+	if (arg_count(cmd) != 1)
+		path = cmd->argv[1];
+	else
+		path = "~";
 	if (path[0] == '~')
 		change_path(mini, ft_strdup(find_env(mini->env, "HOME")->value));
 	if (path[0] == '/')
@@ -84,7 +86,7 @@ void	mini_cd(t_mini *mini, t_cmd *cmd)
 		ft_printferror("cd: %s: %s\n", path, strerror(errno));
 		free(mini->path);
 		mini->path = old;
-		mini->prev_exit = errno;
+		mini->prev_exit = 1;
 	}
 	else
 		free(old);

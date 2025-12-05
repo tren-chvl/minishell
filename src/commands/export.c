@@ -6,7 +6,7 @@
 /*   By: dedavid <dedavid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 17:04:33 by dedavid           #+#    #+#             */
-/*   Updated: 2025/12/03 11:04:06 by dedavid          ###   ########.fr       */
+/*   Updated: 2025/12/04 23:10:28 by dedavid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,12 @@ void	actually_export(t_mini *mini, char *name, char *value)
 	new = find_env(mini->env, name);
 	if (new)
 	{
+		free(name);
 		if (value)
+		{
+			free(new->value);
 			new->value = value;
+		}
 		return ;
 	}
 	new = malloc(sizeof(t_env));
@@ -33,6 +37,8 @@ void	actually_export(t_mini *mini, char *name, char *value)
 	new->value = value;
 	ft_lstadd_back(&mini->env, ft_lstnew(new));
 	swap_last(mini);
+	free_envp(mini->envp);
+	mini->envp = create_envp(mini);
 }
 
 int	name_isvalid(char *str)
@@ -72,6 +78,8 @@ int	get_end(char *str, char stop)
 	d = -1;
 	while (str[++i])
 	{
+		if (i == 0 && str[i] == stop)
+			continue ;
 		if (str[i] == '\'')
 			s *= -1;
 		if (str[i] == '\"')

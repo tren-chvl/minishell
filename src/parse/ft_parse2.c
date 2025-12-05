@@ -6,7 +6,7 @@
 /*   By: marcheva <marcheva@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/26 13:12:12 by marcheva          #+#    #+#             */
-/*   Updated: 2025/12/03 10:44:10 by marcheva         ###   ########.fr       */
+/*   Updated: 2025/12/04 22:03:30 by marcheva         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,15 @@ void	exec_all_cmd(t_cmd *cmd, t_mini *mini)
 
 	f_stin = dup(0);
 	f_stdou = dup(1);
-	ft_redirection(cmd, mini);
+	if (ft_redirection(cmd, mini))
+	{
+		mini->prev_exit = 1;
+		dup2(f_stin, 0);
+		dup2(f_stdou, 1);
+		close(f_stin);
+		close(f_stdou);
+		return ;
+	}
 	if (is_builtin(cmd->argv[0]))
 		exec_build(cmd, mini);
 	else
@@ -40,11 +48,15 @@ void	exec_cmd(t_cmd *cmd, t_mini *mini)
 		{
 			if (cmd->delimiter)
 			{
-				mini->last = 2;
+				mini->prev_exit = 2;
 				return ;
 			}
-			ft_redirection(cmd, mini);
-			mini->last = 0;
+			if (ft_redirection(cmd, mini))
+			{
+				mini->prev_exit = 1;
+				return ;
+			}
+			mini->prev_exit = 0;
 			return ;
 		}
 		exec_all_cmd(cmd, mini);
@@ -53,11 +65,15 @@ void	exec_cmd(t_cmd *cmd, t_mini *mini)
 
 void	run_child(t_cmd *cmd, t_mini *mini, char *exec)
 {
-	ft_redirection(cmd, mini);
+	if (ft_redirection(cmd, mini))
+		exit(mini->prev_exit);
 	if (execve(exec, cmd->argv, mini->envp) == -1)
 	{
-		perror("execve");
-		return ;
+		if (errno == EACCES || errno == EISDIR)
+			exit(126);
+		if (errno == ENOENT)
+			exit(127);
+		exit(127);
 	}
 }
 
@@ -65,8 +81,21 @@ int	commande_not_found(t_cmd *cmd, char *exec, t_mini *mini)
 {
 	if (!exec)
 	{
-		ft_printf("minishell : %s: command not found\n", cmd->argv[0]);
-		mini->last = 127;
+		if (errno == EISDIR)
+		{
+			ft_printferror("minishell: %s: Is a directory\n", cmd->argv[0]);
+			mini->prev_exit = 126;
+		}
+		else if (errno == EACCES)
+		{
+			ft_printferror("minishell: %s: Permission denied\n", cmd->argv[0]);
+			mini->prev_exit = 126;
+		}
+		else
+		{
+			ft_printferror("minishell: %s: command not found\n", cmd->argv[0]);
+			mini->prev_exit = 127;
+		}
 		return (1);
 	}
 	return (0);
@@ -93,7 +122,10 @@ void	exec_no_build(t_cmd *cmd, t_mini *mini)
 	else
 	{
 		waitpid(pid, &statut, 0);
-		mini->last = WEXITSTATUS(statut);
+		if (WIFEXITED(statut))
+			mini->prev_exit = WEXITSTATUS(statut);
+		else if (WIFSIGNALED(statut))
+			mini->prev_exit = 128 + WTERMSIG(statut);
 	}
 	free(exec);
 }

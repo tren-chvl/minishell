@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   gestion_redirection.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcheva <marcheva@student.42.fr>          +#+  +:+       +#+        */
+/*   By: dedavid <dedavid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/02 14:19:05 by marcheva          #+#    #+#             */
-/*   Updated: 2025/12/03 10:43:29 by marcheva         ###   ########.fr       */
+/*   Updated: 2025/12/04 21:20:23 by dedavid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,29 +80,8 @@ char	*check_redir_syntax(t_token *toks, int ntok)
 
 int	check_files(t_cmd *cmd, t_mini *mini)
 {
-	int	fd;
-
-	if (cmd->intfile)
-	{
-		fd = open(cmd->intfile, O_RDONLY);
-		if (fd == -1)
-			return (perror(cmd->intfile), mini->last = 1, -1);
-		close(fd);
-	}
-	if (cmd->outfile)
-	{
-		if (cmd->append)
-			fd = open(cmd->outfile, O_WRONLY | O_CREAT | O_APPEND, 0644);
-		else
-			fd = open(cmd->outfile, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-		if (fd == -1)
-		{
-			perror(cmd->outfile);
-			mini->last = 1;
-			return (-1);
-		}
-		close(fd);
-	}
+	(void)cmd;
+	(void)mini;
 	return (0);
 }
 
@@ -110,14 +89,14 @@ int	f_ck_redirection(t_cmd *cmd, t_mini *mini, t_token *toks, int ntok)
 {
 	char	*err;
 
+	(void)cmd;
 	err = check_redir_syntax(toks, ntok);
 	if (err)
 	{
-		ft_printf("minishell: syntax error near unexpected token `%s'\n", err);
-		mini->last = 2;
+		ft_printferror("minishell: syntax error near unexpected token `%s'\n",
+			err);
+		mini->prev_exit = 2;
 		return (-1);
 	}
-	if (check_files(cmd, mini) == -1)
-		return (-1);
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: marcheva <marcheva@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/01 13:53:51 by marcheva          #+#    #+#             */
-/*   Updated: 2025/12/02 14:19:25 by marcheva         ###   ########.fr       */
+/*   Updated: 2025/12/04 22:04:09 by marcheva         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,4 +52,32 @@ void	process_heredoc(t_cmd *cmd)
 		free(line);
 	}
 	cmd->here_doc = tmp;
+}
+
+void	join_adjacent_words(t_token *toks, int *ntok)
+{
+	int		i;
+	int		j;
+	char	*joined;
+
+	i = 0;
+	while (i < *ntok - 1)
+	{
+		if (toks[i].type == TOK_WORD && toks[i + 1].type == TOK_WORD
+			&& toks[i + 1].bef == 0)
+		{
+			joined = ft_strjoin(toks[i].val, toks[i + 1].val);
+			free(toks[i].val);
+			toks[i].val = joined;
+			j = i + 1;
+			while (j < *ntok - 1)
+			{
+				toks[j] = toks[j + 1];
+				j++;
+			}
+			(*ntok)--;
+			continue ;
+		}
+		i++;
+	}
 }

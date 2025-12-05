@@ -6,7 +6,7 @@
 /*   By: dedavid <dedavid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 16:41:31 by dedavid           #+#    #+#             */
-/*   Updated: 2025/12/03 11:04:11 by dedavid          ###   ########.fr       */
+/*   Updated: 2025/12/04 17:48:39 by dedavid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,23 +15,26 @@
 int	exit_parsing(t_cmd *cmd)
 {
 	char	**tab;
-	int		i;
+	int		operator;
+	int		count;
 
-	i = 0;
 	tab = cmd->argv;
-	while (tab[++i])
+	count = arg_count(cmd);
+	operator = 0;
+	if (tab[1][0] == '-' || tab[1][0] == '+')
+		operator = 1;
+	if (!str_isdigit(&tab[1][operator]))
 	{
-		if (i == 1 && !str_isdigit(tab[i]))
-		{
-			ft_printferror("exit: %s: numeric argument required\n", tab[i]);
-			return (2);
-		}
+		ft_printferror("exit: %s: numeric argument required\n", tab[1]);
+		return (2);
 	}
-	if (i != 2)
+	if (count > 2)
 	{
 		ft_printferror("exit: too many arguments\n");
 		return (-1);
 	}
+	if (count == 1)
+		return (0);
 	return ((unsigned char) ft_atoi(tab[1]));
 }
 

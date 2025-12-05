@@ -6,7 +6,7 @@
 /*   By: dedavid <dedavid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/28 08:58:38 by dedavid           #+#    #+#             */
-/*   Updated: 2025/12/03 11:52:27 by dedavid          ###   ########.fr       */
+/*   Updated: 2025/12/04 23:07:20 by dedavid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@ int	find_env_symbol(char *str, int offset)
 	int		i;
 
 	i = -1 + offset;
+	if (i >= (int) ft_strlen(str))
+		return (-1);
 	quote = 1;
 	while (str[++i])
 	{
@@ -53,14 +55,17 @@ void	write_env(t_mini *mini, char **str, int start, char *name)
 	env = find_env(mini->env, name);
 	if (env)
 		value = env->value;
-	else if (ft_strcmp(name, "?") == 0)
+	else if (ft_strncmp(name, "?", 1) == 0)
 		value = ft_itoa(mini->prev_exit);
 	else
-		return ;
-	lenght = find_end(*str, start) - start;
+		value = ft_strdup("");
+	if (ft_strncmp(name, "?", 1) == 0)
+		lenght = 2;
+	else
+		lenght = find_end(*str, start) - start;
 	(*str)[start] = '\0';
 	temp = ft_strjoin(*str, value);
-	new = ft_strjoin(temp, &(*str)[lenght]);
+	new = ft_strjoin(temp, &(*str)[lenght + start]);
 	free(temp);
 	free(*str);
 	if (!env)
@@ -88,21 +93,29 @@ void	str_hasenv(t_mini *mini, char **str_ptr)
 	}
 }
 
-void	replace_env(t_mini *mini, t_cmd *cmd)
+void	replace_env(t_mini *mini, t_token *token, int nbtok)
 {
+	char	*str;
+	int		*to_del;
 	int		i;
+	int		j;
+	int		k;
 
-	i = -1;
-	while (cmd)
+	k = -1;
+	while (++k < nbtok)
 	{
-		if (!cmd->argv)
-		{
-			cmd = cmd->next;
+		if (!token[k].val)
 			continue ;
-		}
+		str_hasenv(mini, &token[k].val);
+		str = token[k].val;
+		to_del = malloc(sizeof(int) * ft_strlen(str));
 		i = -1;
-		while (cmd->argv[++i])
-			str_hasenv(mini, &cmd->argv[i]);
-		cmd = cmd->next;
+		j = 0;
+		while (str[++i])
+			if ((str[i] == '\'' || str[i] == '\"') && !is_in_quotes(str, i))
+				to_del[j++] = i;
+		while (--j >= 0)
+			move_left(str, to_del[j]);
+		free(to_del);
 	}
 }

@@ -6,7 +6,7 @@
 /*   By: marcheva <marcheva@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 15:41:16 by dedavid           #+#    #+#             */
-/*   Updated: 2025/12/03 16:04:51 by marcheva         ###   ########.fr       */
+/*   Updated: 2025/12/04 22:04:28 by marcheva         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,8 @@ void	after_run(t_mini *mini, char *line)
 	int		nbtok;
 
 	token = ft_token(line, &nbtok);
+	replace_env(mini, token, nbtok);
+	join_adjacent_words(token, &nbtok);
 	cmd = parse_command_line_from_tokens(token, nbtok);
 	if (!cmd)
 	{
@@ -42,12 +44,11 @@ void	after_run(t_mini *mini, char *line)
 		free_token(token, nbtok);
 		return ;
 	}
-	replace_env(mini, cmd);
 	process_all_heredocs(cmd);
 	exec_cmd(cmd, mini);
 	free_cmd(cmd);
 	free_token(token, nbtok);
-	add_history(line);
+	free(line);
 }
 
 void	run_shell(t_mini *mini)
@@ -58,17 +59,17 @@ void	run_shell(t_mini *mini)
 	setup_signals();
 	while (1)
 	{
-		line = readline("ft_suicide $ ");
-		if (!line)
-			break ;
+		line = readline("minishell $ ");
 		if (ctrl_d(mini, line))
 		{
 			free(line);
 			break ;
 		}
+		add_history(line);
 		if (*line)
 			after_run(mini, line);
-		free(line);
+		else
+			free(line);
 	}
 }
 
@@ -94,10 +95,10 @@ int	main(int ac, char **av, char **envp)
 	(void)av;
 	mini = malloc(sizeof(t_mini));
 	mini->env = NULL;
-	mini->envp = envp;
 	mini->prev_exit = 0;
 	getpath(mini);
 	fill_env(mini, envp);
+	mini->envp = create_envp(mini);
 	run_shell(mini);
 	free_mini(mini);
 	return (0);
