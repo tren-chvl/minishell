@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_parse3.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dedavid <dedavid@student.42.fr>            +#+  +:+       +#+        */
+/*   By: marcheva <marcheva@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/26 16:00:50 by marcheva          #+#    #+#             */
-/*   Updated: 2025/12/04 21:22:48 by dedavid          ###   ########.fr       */
+/*   Updated: 2025/12/05 14:23:08 by marcheva         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,9 +76,17 @@ char	*find_exec(t_mini *mini, char *cmd)
 			errno = EISDIR;
 			return (NULL);
 		}
-		if (access(cmd, X_OK) == 0)
-			return (ft_strdup(cmd));
-		return (NULL);
+		if (access(cmd, F_OK) != 0)
+		{
+			errno = ENOENT;
+			return (NULL);
+		}
+		if (access(cmd, X_OK) != 0)
+		{
+			errno = EACCES;
+			return (NULL);
+		}
+		return (ft_strdup(cmd));
 	}
 	return (search_in_path(mini, cmd));
 }

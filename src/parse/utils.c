@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dedavid <dedavid@student.42.fr>            +#+  +:+       +#+        */
+/*   By: marcheva <marcheva@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/02 10:28:09 by dedavid           #+#    #+#             */
-/*   Updated: 2025/12/04 15:08:16 by dedavid          ###   ########.fr       */
+/*   Updated: 2025/12/05 14:22:53 by marcheva         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,4 +82,23 @@ void	move_left(char *str, int pos)
 	i = pos - 1;
 	while (str[++i])
 		str[i] = str[i + 1];
+}
+
+void	update_status(t_mini *mini, pid_t wpid, pid_t last_pid, int status)
+{
+	int	sig;
+
+	if (wpid == last_pid)
+	{
+		if (WIFEXITED(status))
+			mini->prev_exit = WEXITSTATUS(status);
+		else if (WIFSIGNALED(status))
+		{
+			sig = WTERMSIG(status);
+			if (sig == SIGPIPE)
+				mini->prev_exit = 128 + SIGPIPE;
+			else
+				mini->prev_exit = 128 + sig;
+		}
+	}
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parse_command.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dedavid <dedavid@student.42.fr>            +#+  +:+       +#+        */
+/*   By: marcheva <marcheva@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/03 10:38:26 by marcheva          #+#    #+#             */
-/*   Updated: 2025/12/04 15:45:43 by dedavid          ###   ########.fr       */
+/*   Updated: 2025/12/05 13:48:59 by marcheva         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,4 +54,23 @@ t_cmd	*parse_command_line(char *line)
 	parse_tokens(toks, ntok, &head, &cur);
 	free_token(toks, ntok);
 	return (head);
+}
+
+void	handle_redir(t_cmd *res, t_token *toks, int nbtok, int *i)
+{
+	if ((toks[*i].type == TOK_GT || toks[*i].type == TOK_GTGT)
+		&& *i + 1 < nbtok && toks[*i + 1].type == TOK_WORD)
+	{
+		handle_outfile(res, toks, i);
+	}
+	else if (toks[*i].type == TOK_LT
+		&& *i + 1 < nbtok && toks[*i + 1].type == TOK_WORD)
+	{
+		handle_infile(res, toks, i);
+	}
+	else if (toks[*i].type == TOK_LTLT
+		&& *i + 1 < nbtok && toks[*i + 1].type == TOK_WORD)
+	{
+		handle_delimiter(res, toks, i);
+	}
 }

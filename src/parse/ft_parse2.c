@@ -6,7 +6,7 @@
 /*   By: marcheva <marcheva@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/26 13:12:12 by marcheva          #+#    #+#             */
-/*   Updated: 2025/12/04 22:03:30 by marcheva         ###   ########.fr       */
+/*   Updated: 2025/12/05 16:15:06 by marcheva         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,7 @@ void	run_child(t_cmd *cmd, t_mini *mini, char *exec)
 {
 	if (ft_redirection(cmd, mini))
 		exit(mini->prev_exit);
+	close_fds();
 	if (execve(exec, cmd->argv, mini->envp) == -1)
 	{
 		if (errno == EACCES || errno == EISDIR)

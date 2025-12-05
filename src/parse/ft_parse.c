@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_parse.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dedavid <dedavid@student.42.fr>            +#+  +:+       +#+        */
+/*   By: marcheva <marcheva@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/26 09:40:18 by marcheva          #+#    #+#             */
-/*   Updated: 2025/12/02 11:11:28 by dedavid          ###   ########.fr       */
+/*   Updated: 2025/12/05 16:15:31 by marcheva         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,4 +68,15 @@ void	exec_build(t_cmd *cmd, t_mini *mini)
 		mini_pwd(mini);
 	else if (!ft_strcmp(cmd->argv[0], "env"))
 		mini_env(mini);
+}
+void	close_fds(void)
+{
+	int	fd;
+
+	fd = 3;
+	while (fd < 1024)
+	{
+		close(fd);
+		fd++;
+	}
 }

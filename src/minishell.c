@@ -6,7 +6,7 @@
 /*   By: marcheva <marcheva@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 15:41:16 by dedavid           #+#    #+#             */
-/*   Updated: 2025/12/04 22:04:28 by marcheva         ###   ########.fr       */
+/*   Updated: 2025/12/05 14:31:33 by marcheva         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,6 @@ void	after_run(t_mini *mini, char *line)
 
 	token = ft_token(line, &nbtok);
 	replace_env(mini, token, nbtok);
-	join_adjacent_words(token, &nbtok);
 	cmd = parse_command_line_from_tokens(token, nbtok);
 	if (!cmd)
 	{

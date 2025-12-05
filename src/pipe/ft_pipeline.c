@@ -6,7 +6,7 @@
 /*   By: marcheva <marcheva@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/01 10:18:28 by marcheva          #+#    #+#             */
-/*   Updated: 2025/12/04 21:29:52 by marcheva         ###   ########.fr       */
+/*   Updated: 2025/12/05 14:40:50 by marcheva         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,9 +43,11 @@ void	child_middle(t_cmd *cmd, int *prev_fd, int fd[2], t_mini *mini)
 
 	if (ft_redirection(cmd, mini))
 		exit(1);
-	if (!cmd->here_doc && !cmd->intfile && *prev_fd != STDIN_FILENO)
+	if (!has_redir_type(cmd->redirs, R_HEREDOC)
+		&& !has_redir_type(cmd->redirs, R_IN_FILE) && *prev_fd != STDIN_FILENO)
 		dup2(*prev_fd, STDIN_FILENO);
-	if (!cmd->outfile)
+	if (!has_redir_type(cmd->redirs, R_OUT_TRUNC)
+		&& !has_redir_type(cmd->redirs, R_OUT_APPEND))
 		dup2(fd[1], STDOUT_FILENO);
 	if (*prev_fd != STDIN_FILENO)
 		close(*prev_fd);
@@ -88,7 +90,9 @@ void	last_child(int prev_fd, t_cmd *cmd, t_mini *mini)
 
 	if (ft_redirection(cmd, mini))
 		exit(1);
-	if (!cmd->here_doc && !cmd->intfile && prev_fd != STDIN_FILENO)
+	if (!has_redir_type(cmd->redirs, R_HEREDOC)
+		&& !has_redir_type(cmd->redirs, R_IN_FILE)
+		&& prev_fd != STDIN_FILENO)
 		dup2(prev_fd, STDIN_FILENO);
 	if (prev_fd != STDIN_FILENO)
 		close(prev_fd);

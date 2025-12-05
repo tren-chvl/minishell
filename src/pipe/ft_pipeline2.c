@@ -6,61 +6,11 @@
 /*   By: marcheva <marcheva@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/01 11:38:27 by marcheva          #+#    #+#             */
-/*   Updated: 2025/12/05 11:39:20 by marcheva         ###   ########.fr       */
+/*   Updated: 2025/12/05 13:46:31 by marcheva         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-int	redir_outfile(t_cmd *cmd)
-{
-	int	fd;
-	int	flags;
-
-	if (!cmd->outfile)
-		return (0);
-	flags = O_WRONLY | O_CREAT;
-	if (cmd->append)
-		flags |= O_APPEND;
-	else
-		flags |= O_TRUNC;
-	fd = open(cmd->outfile, flags, 0644);
-	if (fd < 0)
-	{
-		ft_redir_error(cmd->outfile);
-		return (1);
-	}
-	if (dup2(fd, STDOUT_FILENO) == -1)
-	{
-		ft_redir_error(cmd->outfile);
-		close(fd);
-		return (1);
-	}
-	close(fd);
-	return (0);
-}
-
-int	redir_infile(t_cmd *cmd)
-{
-	int	fd;
-
-	if (!cmd->intfile)
-		return (0);
-	fd = open(cmd->intfile, O_RDONLY);
-	if (fd < 0)
-	{
-		ft_redir_error(cmd->intfile);
-		return (1);
-	}
-	if (dup2(fd, STDIN_FILENO) == -1)
-	{
-		ft_redir_error(cmd->intfile);
-		close(fd);
-		return (1);
-	}
-	close(fd);
-	return (0);
-}
 
 int	redir_heredoc(t_cmd *cmd, t_mini *mini)
 {
@@ -86,36 +36,71 @@ int	redir_heredoc(t_cmd *cmd, t_mini *mini)
 	return (0);
 }
 
-
-int ft_redirection(t_cmd *cmd, t_mini *mini)
+int	out_trunc(char *file)
 {
-	if (cmd->outfile != NULL)
+	int	fd;
+
+	fd = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if (fd < 0 || dup2(fd, STDOUT_FILENO) == -1)
 	{
-		if (redir_outfile(cmd) != 0)
-			return (1);
+		ft_printferror("minishell: %s: %s\n", file, strerror(errno));
+		if (fd >= 0)
+			close(fd);
+		return (1);
 	}
-	if (cmd->intfile != NULL)
-	{
-		if (redir_infile(cmd) != 0)
-			return (1);
-	}
-	if (cmd->here_doc != NULL)
-	{
-		if (redir_heredoc(cmd, mini) != 0)
-			return (1);
-	}
+	close(fd);
 	return (0);
 }
 
-
-
-void	update_status(t_mini *mini, pid_t wpid, pid_t last_pid, int status)
+int	out_append(char *file)
 {
-	if (wpid == last_pid)
+	int	fd;
+
+	fd = open(file, O_WRONLY | O_CREAT | O_APPEND, 0644);
+	if (fd < 0 || dup2(fd, STDOUT_FILENO) == -1)
 	{
-		if (WIFEXITED(status))
-			mini->prev_exit = WEXITSTATUS(status);
-		else if (WIFSIGNALED(status))
-			mini->prev_exit = 128 + WTERMSIG(status);
+		ft_printferror("minishell: %s: %s\n", file, strerror(errno));
+		if (fd >= 0)
+			close(fd);
+		return (1);
 	}
+	close(fd);
+	return (0);
+}
+
+int	in_file(char *file)
+{
+	int	fd;
+
+	fd = open(file, O_RDONLY);
+	if (fd < 0 || dup2(fd, STDIN_FILENO) == -1)
+	{
+		ft_printferror("minishell: %s: %s\n", file, strerror(errno));
+		if (fd >= 0)
+			close(fd);
+		return (1);
+	}
+	close(fd);
+	return (0);
+}
+
+int	ft_redirection(t_cmd *cmd, t_mini *mini)
+{
+	t_redir	*r;
+
+	(void)mini;
+	r = cmd->redirs;
+	while (r)
+	{
+		if (r->type == R_OUT_TRUNC && out_trunc(r->filename))
+			return (1);
+		else if (r->type == R_OUT_APPEND && out_append(r->filename))
+			return (1);
+		else if (r->type == R_IN_FILE && in_file(r->filename))
+			return (1);
+		else if (r->type == R_HEREDOC && redir_heredoc(cmd, mini))
+			return (1);
+		r = r->next;
+	}
+	return (0);
 }

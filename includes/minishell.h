@@ -6,7 +6,7 @@
 /*   By: marcheva <marcheva@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/02 10:57:10 by dedavid           #+#    #+#             */
-/*   Updated: 2025/12/05 11:52:56 by marcheva         ###   ########.fr       */
+/*   Updated: 2025/12/05 16:15:15 by marcheva         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,11 +49,11 @@ typedef struct s_env
 
 typedef enum s_redirtype
 {
-    R_OUT_TRUNC,
-    R_OUT_APPEND,
-    R_IN_FILE,
-    R_HEREDOC
-}   t_redirtype;
+	R_OUT_TRUNC,
+	R_OUT_APPEND,
+	R_IN_FILE,
+	R_HEREDOC
+}	t_redirtype;
 
 typedef enum s_toktype
 {
@@ -68,8 +68,8 @@ typedef enum s_toktype
 typedef struct s_redict
 {
 	char			*filename;
-	int				type;
-	struct s_redict *next;
+	t_redirtype		type;
+	struct s_redict	*next;
 }	t_redir;
 
 typedef struct s_token
@@ -168,9 +168,15 @@ void	free_tab(char **tab);
 void	free_cmd(t_cmd *cmd);
 
 //parsing
+void	handle_delimiter(t_cmd *res, t_token *toks, int *i);
+void	handle_infile(t_cmd *res, t_token *toks, int *i);
+void	handle_outfile(t_cmd *res, t_token *toks, int *i);
+void	add_redir(t_cmd *cmd, t_redirtype type, char *filename);
+int		has_redir_type(t_redir *list, t_redirtype type);
 void	parse_tokens(t_token *toks, int ntok, t_cmd **head, t_cmd **cur);
 void	handle_redir(t_cmd *res, t_token *toks, int nbtok, int *i);
 void	join_adjacent_words(t_token *toks, int *ntok);
+void	add_redir(t_cmd *cmd, t_redirtype type, char *filename);
 char	*read_word(char *line, int *i);
 void	para_argv(t_cmd *cmd, char *s);
 void	exec_build(t_cmd *cmd, t_mini *mini);
@@ -196,6 +202,7 @@ pid_t	run_commands_list(t_cmd *cmd_list, t_mini *mini);
 int		ft_isspace(char c);
 t_cmd	*parse_command_line(char *line);
 void	move_left(char *str, int pos);
+void	close_fds(void);
 
 //utils
 void	print_error(char *origine, char *cause);
