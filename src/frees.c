@@ -42,11 +42,17 @@ void	free_env(void *content)
 
 void	free_mini(t_mini *mini)
 {
+	if (mini->save_stdin >= 0)
+		close(mini->save_stdin);
+	if (mini->save_stdout >= 0)
+		close(mini->save_stdout);
+	if (mini->save_stderr >= 0)
+		close(mini->save_stderr);
 	ft_lstclear(&mini->env, free_env);
 	free(mini->path);
 	free_envp(mini->envp);
-	free(mini);
 	rl_clear_history();
+	free(mini);
 }
 
 void	free_tab(char **tab)
@@ -64,26 +70,18 @@ void	free_tab(char **tab)
 	free(tab);
 }
 
-void	free_cmd(t_cmd *cmd)
+void	free_redirs(t_redir *redir)
 {
-	t_cmd	*tmp;
+	t_redir	*tmp;
 
-	while (cmd)
+	while (redir)
 	{
-		tmp = cmd->next;
-		if (cmd->argv)
-			free_tab(cmd->argv);
-		if (cmd->path)
-			free(cmd->path);
-		if (cmd->outfile)
-			free(cmd->outfile);
-		if (cmd->intfile)
-			free(cmd->intfile);
-		if (cmd->here_doc)
-			free(cmd->here_doc);
-		if (cmd->delimiter)
-			free(cmd->delimiter);
-		free(cmd);
-		cmd = tmp;
+		tmp = redir->next;
+		if (redir->filename)
+			free(redir->filename);
+		if (redir->buf_heredoc)
+			free(redir->buf_heredoc);
+		free(redir);
+		redir = tmp;
 	}
 }

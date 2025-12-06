@@ -69,6 +69,7 @@ void	exec_build(t_cmd *cmd, t_mini *mini)
 	else if (!ft_strcmp(cmd->argv[0], "env"))
 		mini_env(mini);
 }
+
 void	close_fds(void)
 {
 	int	fd;

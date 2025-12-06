@@ -15,17 +15,23 @@
 void	process_all_heredocs(t_cmd *cmds)
 {
 	t_cmd	*cur;
+	t_redir	*r;
 
 	cur = cmds;
 	while (cur)
 	{
-		if (cur->delimiter)
-			process_heredoc(cur);
+		r = cur->redirs;
+		while (r)
+		{
+			if (r->type == R_HEREDOC)
+				process_heredoc(r);
+			r = r->next;
+		}
 		cur = cur->next;
 	}
 }
 
-void	process_heredoc(t_cmd *cmd)
+void	process_heredoc(t_redir *redir)
 {
 	char	*line;
 	char	*tmp;
@@ -35,21 +41,23 @@ void	process_heredoc(t_cmd *cmd)
 	while (1)
 	{
 		line = readline("> ");
-		if (!line || !ft_strcmp(line, cmd->delimiter))
+		if (!line || !ft_strcmp(line, redir->filename))
 		{
 			free(line);
 			break ;
 		}
-		if (tmp == NULL)
-			new_tmp = ft_strjoin("", line);
+		if (!redir->quotes)
+			str_hasenv(NULL, &line);
+		if (!tmp)
+			new_tmp = ft_strjoin(line, "\n");
 		else
+		{
 			new_tmp = ft_strjoin(tmp, line);
-		free(tmp);
-		tmp = new_tmp;
-		new_tmp = ft_strjoin(tmp, "\n");
+			new_tmp = ft_strjoin(new_tmp, "\n");
+		}
 		free(tmp);
 		tmp = new_tmp;
 		free(line);
 	}
-	cmd->here_doc = tmp;
+	redir->buf_heredoc = tmp;
 }

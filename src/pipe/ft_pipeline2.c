@@ -12,30 +12,6 @@
 
 #include "minishell.h"
 
-int	redir_heredoc(t_cmd *cmd, t_mini *mini)
-{
-	int	fd[2];
-
-	if (!cmd->here_doc)
-		return (0);
-	if (pipe(fd) == -1)
-	{
-		perror("minishell");
-		return (1);
-	}
-	str_hasenv(mini, &cmd->here_doc);
-	write(fd[1], cmd->here_doc, ft_strlen(cmd->here_doc));
-	close(fd[1]);
-	if (dup2(fd[0], STDIN_FILENO) == -1)
-	{
-		perror("minishell");
-		close(fd[0]);
-		return (1);
-	}
-	close(fd[0]);
-	return (0);
-}
-
 int	out_trunc(char *file)
 {
 	int	fd;
@@ -84,23 +60,65 @@ int	in_file(char *file)
 	return (0);
 }
 
+int	apply_heredoc(t_redir *r, t_mini *mini)
+{
+	int	fd[2];
+
+	if (!r->buf_heredoc)
+		return (0);
+	if (pipe(fd) == -1)
+	{
+		perror("minishell");
+		return (1);
+	}
+	if (!r->quotes)
+		str_hasenv(mini, &r->buf_heredoc);
+	write(fd[1], r->buf_heredoc, ft_strlen(r->buf_heredoc));
+	close(fd[1]);
+	if (dup2(fd[0], STDIN_FILENO) == -1)
+	{
+		perror("minishell");
+		close(fd[0]);
+		return (1);
+	}
+	close(fd[0]);
+	return (0);
+}
+
 int	ft_redirection(t_cmd *cmd, t_mini *mini)
 {
 	t_redir	*r;
+	t_redir	*last_hdoc;
 
-	(void)mini;
+	last_hdoc = NULL;
 	r = cmd->redirs;
 	while (r)
 	{
-		if (r->type == R_OUT_TRUNC && out_trunc(r->filename))
-			return (1);
-		else if (r->type == R_OUT_APPEND && out_append(r->filename))
-			return (1);
-		else if (r->type == R_IN_FILE && in_file(r->filename))
-			return (1);
-		else if (r->type == R_HEREDOC && redir_heredoc(cmd, mini))
-			return (1);
+		if (r->type == R_OUT_TRUNC)
+		{
+			if (out_trunc(r->filename))
+				return (1);
+		}
+		else if (r->type == R_OUT_APPEND)
+		{
+			if (out_append(r->filename))
+				return (1);
+		}
+		else if (r->type == R_IN_FILE)
+		{
+			if (in_file(r->filename))
+				return (1);
+		}
+		else if (r->type == R_HEREDOC)
+		{
+			last_hdoc = r;
+		}
 		r = r->next;
+	}
+	if (last_hdoc)
+	{
+		if (apply_heredoc(last_hdoc, mini))
+			return (1);
 	}
 	return (0);
 }

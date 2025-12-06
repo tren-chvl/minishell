@@ -16,3 +16,21 @@ void	ft_redir_error(char *path)
 {
 	ft_printferror("minishell: %s: %s\n", path, strerror(errno));
 }
+
+void	free_cmd(t_cmd *cmd)
+{
+	t_cmd	*tmp;
+
+	while (cmd)
+	{
+		tmp = cmd->next;
+		if (cmd->argv)
+			free_tab(cmd->argv);
+		if (cmd->path)
+			free(cmd->path);
+		if (cmd->redirs)
+			free_redirs(cmd->redirs);
+		free(cmd);
+		cmd = tmp;
+	}
+}

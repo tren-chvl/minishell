@@ -44,13 +44,8 @@ void	exec_cmd(t_cmd *cmd, t_mini *mini)
 		run_commands_list(cmd, mini);
 	else
 	{
-		if (!cmd->argv || !cmd->argv[0])
+		if (!cmd->argv || !cmd->argv[0] || cmd->argv[0][0] == '\0')
 		{
-			if (cmd->delimiter)
-			{
-				mini->prev_exit = 2;
-				return ;
-			}
 			if (ft_redirection(cmd, mini))
 			{
 				mini->prev_exit = 1;

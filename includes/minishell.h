@@ -68,6 +68,8 @@ typedef enum s_toktype
 typedef struct s_redict
 {
 	char			*filename;
+	char			*buf_heredoc;
+	int				quotes;
 	t_redirtype		type;
 	struct s_redict	*next;
 }	t_redir;
@@ -103,6 +105,9 @@ typedef struct s_mini
 	char	*path;
 	char	**envp;
 	int		last;
+	int		save_stdin;
+	int		save_stdout;
+	int		save_stderr;
 	t_list	*env;
 }	t_mini;
 
@@ -113,10 +118,7 @@ typedef struct s_cmd
 	char			**argv;
 	char			*outfile;
 	char			*intfile;
-	char			*here_doc;
-	char			*delimiter;
 	int				append;
-	int				here_fd;
 	t_redir			*redirs;
 	struct s_cmd	*next;
 }	t_cmd;
@@ -168,15 +170,14 @@ void	free_tab(char **tab);
 void	free_cmd(t_cmd *cmd);
 
 //parsing
+void	restore_stdio(t_mini *mini);
 void	handle_delimiter(t_cmd *res, t_token *toks, int *i);
 void	handle_infile(t_cmd *res, t_token *toks, int *i);
 void	handle_outfile(t_cmd *res, t_token *toks, int *i);
-void	add_redir(t_cmd *cmd, t_redirtype type, char *filename);
 int		has_redir_type(t_redir *list, t_redirtype type);
 void	parse_tokens(t_token *toks, int ntok, t_cmd **head, t_cmd **cur);
 void	handle_redir(t_cmd *res, t_token *toks, int nbtok, int *i);
-void	join_adjacent_words(t_token *toks, int *ntok);
-void	add_redir(t_cmd *cmd, t_redirtype type, char *filename);
+t_redir	*add_redir(t_cmd *cmd, t_redirtype type, char *filename);
 char	*read_word(char *line, int *i);
 void	para_argv(t_cmd *cmd, char *s);
 void	exec_build(t_cmd *cmd, t_mini *mini);
@@ -185,7 +186,7 @@ int		f_ck_redirection(t_cmd *cmd, t_mini *mini, t_token *toks, int ntok);
 void	str_hasenv(t_mini *mini, char **str_ptr);
 int		is_in_quotes(char *str, int pos);
 void	process_all_heredocs(t_cmd *cmds);
-void	process_heredoc(t_cmd *cmd);
+void	process_heredoc(t_redir *redir);
 int		ft_signe(char c);
 int		is_builtin(char *cmd);
 void	exec_cmd(t_cmd *cmd, t_mini *mini);

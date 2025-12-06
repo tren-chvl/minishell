@@ -74,3 +74,10 @@ void	handle_redir(t_cmd *res, t_token *toks, int nbtok, int *i)
 		handle_delimiter(res, toks, i);
 	}
 }
+
+void	restore_stdio(t_mini *mini)
+{
+	dup2(mini->save_stdin, STDIN_FILENO);
+	dup2(mini->save_stdout, STDOUT_FILENO);
+	dup2(mini->save_stderr, STDERR_FILENO);
+}

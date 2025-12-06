@@ -16,15 +16,9 @@ void	handle_outfile(t_cmd *res, t_token *toks, int *i)
 {
 	res->outfile = toks[*i + 1].val;
 	if (toks[*i].type == TOK_GTGT)
-	{
-		res->append = 1;
 		add_redir(res, R_OUT_APPEND, toks[*i + 1].val);
-	}
 	else
-	{
-		res->append = 0;
 		add_redir(res, R_OUT_TRUNC, toks[*i + 1].val);
-	}
 	toks[*i + 1].val = NULL;
 	(*i)++;
 }
@@ -39,32 +33,38 @@ void	handle_infile(t_cmd *res, t_token *toks, int *i)
 
 void	handle_delimiter(t_cmd *res, t_token *toks, int *i)
 {
-	res->delimiter = toks[*i + 1].val;
-	add_redir(res, R_HEREDOC, toks[*i + 1].val);
+	t_redir	*r;
+
+	r = add_redir(res, R_HEREDOC, toks[*i + 1].val);
+	if (r)
+		r->quotes = is_in_quotes(toks[*i + 1].val, 0);
 	toks[*i + 1].val = NULL;
 	(*i)++;
 }
 
-void	add_redir(t_cmd *cmd, t_redirtype type, char *filename)
+t_redir	*add_redir(t_cmd *cmd, t_redirtype type, char *filename)
 {
 	t_redir	*node;
 	t_redir	*cur;
 
 	node = ft_calloc(1, sizeof(t_redir));
-	if (node == NULL)
-		return ;
+	if (!node)
+		return (NULL);
 	node->type = type;
 	node->filename = filename;
+	node->buf_heredoc = NULL;
+	node->quotes = 0;
 	node->next = NULL;
-	if (cmd->redirs == NULL)
-	{
+	if (!cmd->redirs)
 		cmd->redirs = node;
-		return ;
+	else
+	{
+		cur = cmd->redirs;
+		while (cur->next)
+			cur = cur->next;
+		cur->next = node;
 	}
-	cur = cmd->redirs;
-	while (cur->next != NULL)
-		cur = cur->next;
-	cur->next = node;
+	return (node);
 }
 
 int	has_redir_type(t_redir *list, t_redirtype type)

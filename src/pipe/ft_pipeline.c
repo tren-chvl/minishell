@@ -12,6 +12,12 @@
 
 #include "minishell.h"
 
+void	close_pipe(int fd[2])
+{
+	close(fd[0]);
+	close(fd[1]);
+}
+
 pid_t	run_commands_list(t_cmd *cmd_list, t_mini *mini)
 {
 	t_cmd	*cmd;
@@ -44,15 +50,15 @@ void	child_middle(t_cmd *cmd, int *prev_fd, int fd[2], t_mini *mini)
 	if (ft_redirection(cmd, mini))
 		exit(1);
 	if (!has_redir_type(cmd->redirs, R_HEREDOC)
-		&& !has_redir_type(cmd->redirs, R_IN_FILE) && *prev_fd != STDIN_FILENO)
+		&& !has_redir_type(cmd->redirs, R_IN_FILE)
+		&& *prev_fd != STDIN_FILENO)
 		dup2(*prev_fd, STDIN_FILENO);
 	if (!has_redir_type(cmd->redirs, R_OUT_TRUNC)
 		&& !has_redir_type(cmd->redirs, R_OUT_APPEND))
 		dup2(fd[1], STDOUT_FILENO);
 	if (*prev_fd != STDIN_FILENO)
 		close(*prev_fd);
-	close(fd[0]);
-	close(fd[1]);
+	close_pipe(fd);
 	if (!cmd->argv || !cmd->argv[0])
 		exit(0);
 	exec = find_exec(mini, cmd->argv[0]);
@@ -61,6 +67,9 @@ void	child_middle(t_cmd *cmd, int *prev_fd, int fd[2], t_mini *mini)
 		ft_printferror("minishell: %s: command not found\n", cmd->argv[0]);
 		exit(127);
 	}
+	close(mini->save_stdin);
+	close(mini->save_stdout);
+	close(mini->save_stderr);
 	execve(exec, cmd->argv, mini->envp);
 	perror("execve");
 	exit(127);
@@ -104,6 +113,9 @@ void	last_child(int prev_fd, t_cmd *cmd, t_mini *mini)
 		ft_printferror("minishell: %s: command not found\n", cmd->argv[0]);
 		exit(127);
 	}
+	close(mini->save_stdin);
+	close(mini->save_stdout);
+	close(mini->save_stderr);
 	execve(exec, cmd->argv, mini->envp);
 	perror("execve");
 	exit(127);

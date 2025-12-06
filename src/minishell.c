@@ -45,6 +45,7 @@ void	after_run(t_mini *mini, char *line)
 	}
 	process_all_heredocs(cmd);
 	exec_cmd(cmd, mini);
+	restore_stdio(mini);
 	free_cmd(cmd);
 	free_token(token, nbtok);
 	free(line);
@@ -95,6 +96,9 @@ int	main(int ac, char **av, char **envp)
 	mini = malloc(sizeof(t_mini));
 	mini->env = NULL;
 	mini->prev_exit = 0;
+	mini->save_stdin = dup(STDIN_FILENO);
+	mini->save_stdout = dup(STDOUT_FILENO);
+	mini->save_stderr = dup(STDERR_FILENO);
 	getpath(mini);
 	fill_env(mini, envp);
 	mini->envp = create_envp(mini);
